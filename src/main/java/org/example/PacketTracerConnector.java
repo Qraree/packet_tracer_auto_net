@@ -34,7 +34,6 @@
                 // 6. Доступ к GUI Packet Tracer
                 AppWindow appWindow = ipc.appWindow();
 
-                Thread.sleep(2000);
 
                 // 7. Переключаем PT в режим симуляции
                 appWindow.getRSSwitch().showSimulationMode();
@@ -46,6 +45,7 @@
                 Options options = networkFile.getOptions();
                 options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
 
+                System.out.println("Подключение к Packet Tracer установлено!");
                 System.out.println("Подключение к Packet Tracer установлено!");
 
             } catch (Exception e) {
