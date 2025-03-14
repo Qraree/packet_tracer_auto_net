@@ -1,4 +1,4 @@
-package org.example;
+package org.core;
 
 import com.cisco.pt.impl.OptionsManager;
 import com.cisco.pt.ipc.IPCFactory;
@@ -14,9 +14,13 @@ import com.cisco.pt.ptmp.PacketTracerSession;
 import com.cisco.pt.ptmp.PacketTracerSessionFactory;
 import com.cisco.pt.ptmp.impl.PacketTracerSessionFactoryImpl;
 import java.io.IOException;
-import org.example.events.EventManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.core.events.EventManager;
 
 public class PacketTracerConnector {
+  private static final Logger logger = Logger.getLogger(PacketTracerConnector.class.getName());
+
   public static void main(String[] args) {
     try {
 
@@ -40,11 +44,11 @@ public class PacketTracerConnector {
       eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
 
       System.out.println(network.getDeviceCount());
-      System.out.println("Подключение к Packet Tracer установлено!");
+      System.out.println("Connection to Packet Tracer Successful!");
 
     } catch (Exception e) {
-      e.printStackTrace();
-      System.out.println("Ошибка при подключении к Packet Tracer.");
+      logger.log(Level.SEVERE, "An error occurred: ", e);
+      System.out.println("Error connecting to Packet Tracer.");
     }
   }
 

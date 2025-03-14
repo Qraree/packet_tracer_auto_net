@@ -1,4 +1,4 @@
-package org.example.events;
+package org.core.events;
 
 import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
 
