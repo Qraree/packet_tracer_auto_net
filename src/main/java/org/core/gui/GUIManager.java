@@ -1,17 +1,22 @@
 package org.core.gui;
 
+import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.io.IOException;
 import java.net.URL;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.core.controllers.MainController;
 
 public class GUIManager {
   Stage primaryStage;
+  MainController mainController;
+  LogicalWorkspace logicalWorkspace;
 
-  public GUIManager(Stage primaryStage) {
+  public GUIManager(Stage primaryStage, LogicalWorkspace logicalWorkspace) {
     this.primaryStage = primaryStage;
+    this.logicalWorkspace = logicalWorkspace;
   }
 
   public void init() throws IOException {
@@ -21,7 +26,11 @@ public class GUIManager {
       throw new RuntimeException("FXML file not found");
     }
 
-    Parent root = FXMLLoader.load(location);
+    FXMLLoader loader = new FXMLLoader(location);
+    Parent root = loader.load();
+
+    mainController = loader.getController();
+    mainController.setLogicalWorkspace(logicalWorkspace);
 
     Scene scene = new Scene(root, 700, 500);
 

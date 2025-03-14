@@ -27,8 +27,6 @@ public class PacketTracerConnector extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    GUIManager guiManager = new GUIManager(primaryStage);
-    guiManager.init();
 
     PacketTracerSession session = setupConnection();
 
@@ -51,6 +49,9 @@ public class PacketTracerConnector extends Application {
 
     System.out.println(network.getDeviceCount());
     System.out.println("Connection to Packet Tracer Successful!");
+
+    GUIManager guiManager = new GUIManager(primaryStage, logicalWorkspace);
+    guiManager.init();
   }
 
   public static void main(String[] args) {
