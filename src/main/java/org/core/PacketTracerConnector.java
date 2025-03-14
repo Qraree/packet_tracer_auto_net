@@ -14,38 +14,48 @@ import com.cisco.pt.ptmp.PacketTracerSession;
 import com.cisco.pt.ptmp.PacketTracerSessionFactory;
 import com.cisco.pt.ptmp.impl.PacketTracerSessionFactoryImpl;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import org.core.events.EventManager;
+import org.core.gui.GUIManager;
 
-public class PacketTracerConnector {
+public class PacketTracerConnector extends Application {
   private static final Logger logger = Logger.getLogger(PacketTracerConnector.class.getName());
+
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    GUIManager guiManager = new GUIManager(primaryStage);
+    guiManager.init();
+
+    PacketTracerSession session = setupConnection();
+
+    IPCFactory ipcFactory = new IPCFactory(session);
+    IPC ipc = ipcFactory.getIPC();
+
+    AppWindow appWindow = ipc.appWindow();
+    Network network = ipc.network();
+
+    appWindow.getRSSwitch().showSimulationMode();
+    NetworkFile networkFile = appWindow.getActiveFile();
+
+    Options options = networkFile.getOptions();
+    options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
+
+    EventManager eventManager = new EventManager(session);
+
+    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
+    eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
+
+    System.out.println(network.getDeviceCount());
+    System.out.println("Connection to Packet Tracer Successful!");
+  }
 
   public static void main(String[] args) {
     try {
-
-      PacketTracerSession session = setupConnection();
-
-      IPCFactory ipcFactory = new IPCFactory(session);
-      IPC ipc = ipcFactory.getIPC();
-
-      AppWindow appWindow = ipc.appWindow();
-      Network network = ipc.network();
-
-      appWindow.getRSSwitch().showSimulationMode();
-      NetworkFile networkFile = appWindow.getActiveFile();
-
-      Options options = networkFile.getOptions();
-      options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
-
-      EventManager eventManager = new EventManager(session);
-
-      LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
-      eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
-
-      System.out.println(network.getDeviceCount());
-      System.out.println("Connection to Packet Tracer Successful!");
-
+      launch();
     } catch (Exception e) {
       logger.log(Level.SEVERE, "An error occurred: ", e);
       System.out.println("Error connecting to Packet Tracer.");
@@ -56,9 +66,11 @@ public class PacketTracerConnector {
     PacketTracerSessionFactory sessionFactory = PacketTracerSessionFactoryImpl.getInstance();
     ConnectionNegotiationProperties cnp = OptionsManager.getInstance().getConnectOpts();
 
-    cnp.setAuthenticationSecret("cisco");
-    cnp.setAuthenticationApplication("com.example.myapp");
+    Map<String, String> env = System.getenv();
 
-    return sessionFactory.openSession("localhost", 39000, cnp);
+    cnp.setAuthenticationSecret(env.get("SECRET"));
+    cnp.setAuthenticationApplication(env.get("AUTH_APPLICATION"));
+
+    return sessionFactory.openSession(env.get("URL"), Integer.parseInt(env.get("PORT")), cnp);
   }
 }
