@@ -13,6 +13,9 @@ import javafx.scene.layout.StackPane;
 
 public class MainController implements Initializable {
   public LogicalWorkspace logicalWorkspace;
+  public DevicePageController deviceController;
+  public ConfigurationPageController configurationController;
+
   @FXML private StackPane stackPane;
 
   @Override
@@ -25,24 +28,33 @@ public class MainController implements Initializable {
   }
 
   public void devicePage(ActionEvent actionEvent) throws IOException {
-    loadStackPage("/fxml/device_page.fxml");
+    FXMLLoader loader = loadStackPage("/fxml/device_page.fxml");
+
+    deviceController = loader.getController();
+    deviceController.setLogicalWorkspace(logicalWorkspace);
   }
 
   public void configurationPage(ActionEvent actionEvent) throws IOException {
-    loadStackPage("/fxml/configuration_page.fxml");
+    FXMLLoader loader = loadStackPage("/fxml/configuration_page.fxml");
+
+    configurationController = loader.getController();
+    configurationController.setLogicalWorkspace(logicalWorkspace);
   }
 
-  private void loadStackPage(String location) throws IOException {
+  private FXMLLoader loadStackPage(String location) throws IOException {
     URL locationURL = getClass().getResource(location);
 
     if (locationURL == null) {
       throw new RuntimeException("Location not found");
     }
 
-    Parent root = FXMLLoader.load(locationURL);
+    FXMLLoader loader = new FXMLLoader(locationURL);
+    Parent root = loader.load();
 
     stackPane.getChildren().removeAll();
     stackPane.getChildren().setAll(root);
+
+    return loader;
   }
 
   public void setLogicalWorkspace(LogicalWorkspace logicalWorkspace) {

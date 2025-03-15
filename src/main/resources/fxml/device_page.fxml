@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.Pane?>
 <Pane xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.core.gui.controllers.DeviceContoller"
+      fx:controller="org.core.gui.controllers.DevicePageController"
 >
     <Button text="Device page!"/>
 </Pane>
