@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.core.controllers.MainController"
-            prefHeight="400.0" prefWidth="600.0">
-    <Button text="Add device!" fx:id="myButton" onAction="#handleButtonClick"/>
-</AnchorPane>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.core.controllers.MainController">
+    <top>
+        <Pane prefHeight="32.0" prefWidth="1000.0" style="-fx-background-color: #4a5bab;" BorderPane.alignment="CENTER">
+            <children>
+                <Label layoutX="21.0" layoutY="8.0" text="PT configuration" textFill="WHITE"/>
+            </children>
+        </Pane>
+    </top>
+    <left>
+        <Pane prefHeight="668.0" prefWidth="131.0" style="-fx-background-color: #fff;" BorderPane.alignment="CENTER">
+            <children>
+                <VBox prefHeight="205.0" prefWidth="134.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#devicePage" prefHeight="33.0" prefWidth="131.0"
+                                style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;" text="Список устройств"
+                                textAlignment="CENTER"/>
+                        <Button mnemonicParsing="false" onAction="#configurationPage" prefHeight="33.0"
+                                prefWidth="131.0" style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;"
+                                text="Конфигурация"/>
+                    </children>
+                </VBox>
+            </children>
+        </Pane>
+    </left>
+    <center>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: #b5b8bd;" fx:id="stackPane"
+                           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                           AnchorPane.topAnchor="0.0"/>
+            </children>
+        </AnchorPane>
+    </center>
+</BorderPane>

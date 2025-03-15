@@ -32,10 +32,11 @@ public class GUIManager {
     mainController = loader.getController();
     mainController.setLogicalWorkspace(logicalWorkspace);
 
-    Scene scene = new Scene(root, 700, 500);
+    Scene scene = new Scene(root, 1000, 700);
 
     primaryStage.setTitle("PT Auto Network");
     primaryStage.setScene(scene);
+    primaryStage.setResizable(false);
     primaryStage.show();
 
     primaryStage.setOnCloseRequest(_ -> System.exit(0));
