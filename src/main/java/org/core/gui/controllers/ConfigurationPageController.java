@@ -1,7 +1,9 @@
 package org.core.gui.controllers;
 
+import com.cisco.pt.UUID;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import org.core.config.DeviceModelEnum;
@@ -32,6 +34,9 @@ public class ConfigurationPageController {
         (String) DevicesArray[randomDeviceIndex][1],
         randomXCoordinate,
         randomYCoordinate);
+
+    List<UUID> itemsIds = logicalWorkspace.getCanvasItemIds();
+    System.out.println(itemsIds);
   }
 
   public void handleAddDevicesGroupAction() {
@@ -41,7 +46,7 @@ public class ConfigurationPageController {
 
     int startXCoord = 300;
     int startYCoord = 300;
-    int step = 50;
+    int step = 60;
 
     int devicesCount = 10;
 

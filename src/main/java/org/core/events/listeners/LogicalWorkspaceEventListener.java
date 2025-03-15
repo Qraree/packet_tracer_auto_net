@@ -1,6 +1,7 @@
-package org.core.events;
+package org.core.events.listeners;
 
 import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
+import org.core.events.EventListener;
 
 public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
   @Override

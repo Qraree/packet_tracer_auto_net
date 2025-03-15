@@ -46,6 +46,7 @@ public class PacketTracerConnector extends Application {
 
     LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
     eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
+    eventManager.registerAppWindowListener(appWindow);
 
     System.out.println(network.getDeviceCount());
     System.out.println("Connection to Packet Tracer Successful!");
