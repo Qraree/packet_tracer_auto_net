@@ -1,4 +1,4 @@
-package org.core.controllers;
+package org.core.gui.controllers;
 
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.io.IOException;

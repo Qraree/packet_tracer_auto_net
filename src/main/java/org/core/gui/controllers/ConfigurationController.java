@@ -1,3 +1,3 @@
-package org.core.controllers;
+package org.core.gui.controllers;
 
 public class ConfigurationController {}

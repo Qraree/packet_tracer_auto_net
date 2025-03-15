@@ -4,11 +4,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 <BorderPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.core.controllers.MainController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.core.gui.controllers.MainController">
     <top>
         <Pane prefHeight="32.0" prefWidth="1000.0" style="-fx-background-color: #4a5bab;" BorderPane.alignment="CENTER">
             <children>
-                <Label layoutX="21.0" layoutY="8.0" text="PT configuration" textFill="WHITE"/>
+                <Label layoutX="21.0" layoutY="8.0" text="Network configuration" textFill="WHITE"/>
             </children>
         </Pane>
     </top>
@@ -31,7 +31,7 @@
     <center>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
-                <StackPane prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: #b5b8bd;" fx:id="stackPane"
+                <StackPane fx:id="stackPane" prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: #b5b8bd;"
                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                            AnchorPane.topAnchor="0.0"/>
             </children>

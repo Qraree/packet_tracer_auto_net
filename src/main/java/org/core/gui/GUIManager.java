@@ -7,7 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.core.controllers.MainController;
+import org.core.gui.controllers.MainController;
 
 public class GUIManager {
   Stage primaryStage;

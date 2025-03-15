@@ -1,13 +1,12 @@
 package org.core.events;
 
-import com.cisco.pt.ipc.events.IPCEventConstants;
 import com.cisco.pt.ipc.events.IPCEventManager;
 import com.cisco.pt.ipc.events.LogicalWorkspaceEventRegistry;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import com.cisco.pt.ptmp.PacketTracerSession;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import org.core.config.Constants;
 
 public class EventManager {
 
@@ -25,9 +24,7 @@ public class EventManager {
 
   public void registerLogicalWorkspaceListener(LogicalWorkspace logicalWorkspace)
       throws IOException {
-    List<String> LWCallbackList = new ArrayList<>();
-    LWCallbackList.add(IPCEventConstants.LOGICAL_WORKSPACE_DEVICE_ADDED);
-    LWCallbackList.add(IPCEventConstants.LOGICAL_WORKSPACE_DEVICE_REMOVED);
+    List<String> LWCallbackList = Constants.LWCallbackList;
 
     LogicalWorkspaceEventListener LWListener = new LogicalWorkspaceEventListener();
     LWRegistry.addSpecificListenerFiltered(
