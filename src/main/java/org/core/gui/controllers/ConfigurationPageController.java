@@ -3,13 +3,35 @@ package org.core.gui.controllers;
 import com.cisco.pt.UUID;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.function.Function;
+import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import org.core.config.DeviceModelEnum;
+import org.core.gui.GUIValidator;
+import org.core.operations.OperationState;
 
-public class ConfigurationPageController {
+public class ConfigurationPageController implements Initializable {
+  public TextField randomCount;
+  public TextField subnetDeviceCount;
+  public ChoiceBox<String> subnetNetworkDeviceChoice;
   private LogicalWorkspace logicalWorkspace;
+
+  @Override
+  public void initialize(URL url, ResourceBundle resourceBundle) {
+    subnetNetworkDeviceChoice
+        .getItems()
+        .addAll(
+            DeviceModelEnum.SWITCH_2960_24TT.getModel(),
+            DeviceModelEnum.SWITCH_3560_24PS.getModel());
+
+    subnetNetworkDeviceChoice.setValue(DeviceModelEnum.SWITCH_2960_24TT.getModel());
+  }
 
   // todo move device methods to DeviceManager class
   public void handleAddRandomDeviceAction() {
@@ -18,8 +40,8 @@ public class ConfigurationPageController {
     }
 
     Object[][] DevicesArray = {
-      {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getValue()},
-      {DeviceType.PC, DeviceModelEnum.PC.getValue()}
+      {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel()},
+      {DeviceType.PC, DeviceModelEnum.PC.getModel()}
     };
     Random random = new Random();
 
@@ -40,6 +62,7 @@ public class ConfigurationPageController {
   }
 
   public void handleAddDevicesGroupAction() {
+
     if (logicalWorkspace == null) {
       throw new RuntimeException("No logical workspace available");
     }
@@ -48,23 +71,47 @@ public class ConfigurationPageController {
     int startYCoord = 300;
     int step = 60;
 
-    int devicesCount = 10;
+    if (!GUIValidator.validateNumberInput(randomCount.getText(), 0, 20)) return;
+    int devicesCount = Integer.parseInt(randomCount.getText());
 
-    int rows = (int) Math.sqrt(devicesCount);
-    int cols = (devicesCount + rows - 1) / rows;
+    addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
+  }
+
+  public void handleAddSubnetAction(ActionEvent actionEvent) {
+    String selectedNetworkDevice = subnetNetworkDeviceChoice.getValue();
+
+    if (!GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
+    int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
+
+    java.util.UUID operationUUID = java.util.UUID.randomUUID();
+    OperationState.getInstance().setCurrentOperation(operationUUID);
+
+    addDeviceGroup(deviceCount, 300, 300, 60);
+    logicalWorkspace.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+  }
+
+  private void addDeviceGroup(Integer count, Integer xCoord, Integer yCoord, Integer step) {
+
+    if (step == null) step = 60;
+    if (xCoord == null) xCoord = 300;
+    if (yCoord == null) yCoord = 300;
+    if (count == null) count = 10;
+
+    int rows = (int) Math.sqrt(count);
+    int cols = (count + rows - 1) / rows;
 
     int deviceCount = 0;
-    for (int currentXCoord = startXCoord;
-        currentXCoord < rows * step + startXCoord;
+    for (int currentXCoord = xCoord;
+        currentXCoord < rows * step + xCoord;
         currentXCoord = currentXCoord + step) {
 
-      for (int currentYCoord = startYCoord;
-          currentYCoord < cols * step + startYCoord;
+      for (int currentYCoord = yCoord;
+          currentYCoord < cols * step + yCoord;
           currentYCoord = currentYCoord + step) {
 
-        if (deviceCount < devicesCount) {
+        if (deviceCount < count) {
           logicalWorkspace.addDevice(
-              DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getValue(), currentXCoord, currentYCoord);
+              DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel(), currentXCoord, currentYCoord);
 
           deviceCount++;
         }

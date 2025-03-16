@@ -1,14 +1,20 @@
 package org.core.events.listeners;
 
 import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
+import java.util.UUID;
 import org.core.events.EventListener;
+import org.core.operations.OperationState;
 
 public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
   @Override
   public void handleEvent(LogicalWorkspaceEvent event) {
     switch (event.type) {
       case DEVICE_ADDED:
+        UUID currentOperationUUID = OperationState.getInstance().getCurrentOperationUUID();
+        System.out.println("Current operation: " + currentOperationUUID.toString());
+
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
+
         System.out.println("Device type: " + LWEvent.type);
         System.out.println("Device model: " + LWEvent.model);
         break;

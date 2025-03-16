@@ -19,8 +19,8 @@ public class DeviceManager {
     }
 
     Object[][] DevicesArray = {
-            {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getValue()},
-            {DeviceType.PC, DeviceModelEnum.PC.getValue()}
+      {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel()},
+      {DeviceType.PC, DeviceModelEnum.PC.getModel()}
     };
     Random random = new Random();
 
@@ -31,9 +31,41 @@ public class DeviceManager {
     double randomYCoordinate = roundedValue.apply(random.nextDouble() * 500);
 
     logicalWorkspace.addDevice(
-            (DeviceType) DevicesArray[randomDeviceIndex][0],
-            (String) DevicesArray[randomDeviceIndex][1],
-            randomXCoordinate,
-            randomYCoordinate);
+        (DeviceType) DevicesArray[randomDeviceIndex][0],
+        (String) DevicesArray[randomDeviceIndex][1],
+        randomXCoordinate,
+        randomYCoordinate);
+  }
+
+  public void addDeviceGroup(Integer count, Integer xCoord, Integer yCoord, Integer step) {
+    if (logicalWorkspace == null) {
+      throw new RuntimeException("No logical workspace available");
+    }
+
+    if (step == null) step = 60;
+    if (xCoord == null) xCoord = 300;
+    if (yCoord == null) yCoord = 300;
+    if (count == null) count = 10;
+
+    int rows = (int) Math.sqrt(count);
+    int cols = (count + rows - 1) / rows;
+
+    int deviceCount = 0;
+    for (int currentXCoord = xCoord;
+        currentXCoord < rows * step + xCoord;
+        currentXCoord = currentXCoord + step) {
+
+      for (int currentYCoord = yCoord;
+          currentYCoord < cols * step + yCoord;
+          currentYCoord = currentYCoord + step) {
+
+        if (deviceCount < count) {
+          logicalWorkspace.addDevice(
+              DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel(), currentXCoord, currentYCoord);
+
+          deviceCount++;
+        }
+      }
+    }
   }
 }
