@@ -8,9 +8,18 @@ import org.core.operations.OperationState;
 public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
   @Override
   public void handleEvent(LogicalWorkspaceEvent event) {
+    System.out.println(event.type);
     switch (event.type) {
       case DEVICE_ADDED:
+        System.out.println("Device added!!!");
         UUID currentOperationUUID = OperationState.getInstance().getCurrentOperationUUID();
+        System.out.println("HEllo?!!!");
+
+        if (currentOperationUUID == null) {
+          System.out.println("No operation found");
+          return;
+        }
+
         System.out.println("Current operation: " + currentOperationUUID.toString());
 
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;

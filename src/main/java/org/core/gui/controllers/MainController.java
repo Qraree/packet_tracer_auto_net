@@ -1,6 +1,5 @@
 package org.core.gui.controllers;
 
-import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -10,11 +9,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
+import org.core.DeviceManager;
 
 public class MainController implements Initializable {
-  public LogicalWorkspace logicalWorkspace;
   public DevicePageController deviceController;
   public ConfigurationPageController configurationController;
+  public DeviceManager deviceManager;
 
   @FXML private StackPane stackPane;
 
@@ -31,14 +31,14 @@ public class MainController implements Initializable {
     FXMLLoader loader = loadStackPage("/fxml/device_page.fxml");
 
     deviceController = loader.getController();
-    deviceController.setLogicalWorkspace(logicalWorkspace);
+    deviceController.setDeviceManager(deviceManager);
   }
 
   public void configurationPage(ActionEvent actionEvent) throws IOException {
     FXMLLoader loader = loadStackPage("/fxml/configuration_page.fxml");
 
     configurationController = loader.getController();
-    configurationController.setLogicalWorkspace(logicalWorkspace);
+    configurationController.setDeviceManager(deviceManager);
   }
 
   private FXMLLoader loadStackPage(String location) throws IOException {
@@ -57,7 +57,7 @@ public class MainController implements Initializable {
     return loader;
   }
 
-  public void setLogicalWorkspace(LogicalWorkspace logicalWorkspace) {
-    this.logicalWorkspace = logicalWorkspace;
+  public void setDeviceManager(DeviceManager deviceManager) {
+    this.deviceManager = deviceManager;
   }
 }

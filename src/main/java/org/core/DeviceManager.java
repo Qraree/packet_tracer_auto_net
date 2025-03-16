@@ -13,10 +13,17 @@ public class DeviceManager {
     this.logicalWorkspace = logicalWorkspace;
   }
 
-  public void addRandomDevice() {
+  public void addDevice(DeviceType deviceType, String model, int x, int y) {
+    logicalWorkspace.addDevice(deviceType, model, x, y);
+  }
+
+  public void addRandomDevice(Integer xBoundary, Integer yBoundary) {
     if (logicalWorkspace == null) {
       throw new RuntimeException("No logical workspace available");
     }
+
+    if (xBoundary == null) xBoundary = 1000;
+    if (yBoundary == null) yBoundary = 500;
 
     Object[][] DevicesArray = {
       {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel()},
@@ -27,8 +34,8 @@ public class DeviceManager {
     int randomDeviceIndex = random.nextInt(DevicesArray.length);
 
     Function<Double, Double> roundedValue = (value) -> Math.round(value * 100.0) / 100.0;
-    double randomXCoordinate = roundedValue.apply(random.nextDouble() * 1000);
-    double randomYCoordinate = roundedValue.apply(random.nextDouble() * 500);
+    double randomXCoordinate = roundedValue.apply(random.nextDouble() * xBoundary);
+    double randomYCoordinate = roundedValue.apply(random.nextDouble() * yBoundary);
 
     logicalWorkspace.addDevice(
         (DeviceType) DevicesArray[randomDeviceIndex][0],

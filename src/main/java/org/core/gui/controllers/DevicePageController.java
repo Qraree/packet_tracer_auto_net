@@ -1,11 +1,12 @@
 package org.core.gui.controllers;
 
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
+import org.core.DeviceManager;
 
 public class DevicePageController {
-  private LogicalWorkspace logicalWorkspace;
+  private DeviceManager deviceManager;
 
-  public void setLogicalWorkspace(LogicalWorkspace logicalWorkspace) {
-    this.logicalWorkspace = logicalWorkspace;
+  public void setDeviceManager(DeviceManager deviceManager) {
+    this.deviceManager = deviceManager;
   }
 }

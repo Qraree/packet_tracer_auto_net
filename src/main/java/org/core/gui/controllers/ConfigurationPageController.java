@@ -1,17 +1,14 @@
 package org.core.gui.controllers;
 
-import com.cisco.pt.UUID;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.net.URL;
-import java.util.List;
-import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.function.Function;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import org.core.DeviceManager;
 import org.core.config.DeviceModelEnum;
 import org.core.gui.GUIValidator;
 import org.core.operations.OperationState;
@@ -20,7 +17,7 @@ public class ConfigurationPageController implements Initializable {
   public TextField randomCount;
   public TextField subnetDeviceCount;
   public ChoiceBox<String> subnetNetworkDeviceChoice;
-  private LogicalWorkspace logicalWorkspace;
+  public DeviceManager deviceManager;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -33,38 +30,14 @@ public class ConfigurationPageController implements Initializable {
     subnetNetworkDeviceChoice.setValue(DeviceModelEnum.SWITCH_2960_24TT.getModel());
   }
 
-  // todo move device methods to DeviceManager class
   public void handleAddRandomDeviceAction() {
-    if (logicalWorkspace == null) {
-      throw new RuntimeException("No logical workspace available");
-    }
-
-    Object[][] DevicesArray = {
-      {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel()},
-      {DeviceType.PC, DeviceModelEnum.PC.getModel()}
-    };
-    Random random = new Random();
-
-    int randomDeviceIndex = random.nextInt(DevicesArray.length);
-
-    Function<Double, Double> roundedValue = (value) -> Math.round(value * 100.0) / 100.0;
-    double randomXCoordinate = roundedValue.apply(random.nextDouble() * 1000);
-    double randomYCoordinate = roundedValue.apply(random.nextDouble() * 500);
-
-    logicalWorkspace.addDevice(
-        (DeviceType) DevicesArray[randomDeviceIndex][0],
-        (String) DevicesArray[randomDeviceIndex][1],
-        randomXCoordinate,
-        randomYCoordinate);
-
-    List<UUID> itemsIds = logicalWorkspace.getCanvasItemIds();
-    System.out.println(itemsIds);
+    deviceManager.addRandomDevice(1000, 500);
   }
 
   public void handleAddDevicesGroupAction() {
 
-    if (logicalWorkspace == null) {
-      throw new RuntimeException("No logical workspace available");
+    if (deviceManager == null) {
+      throw new RuntimeException("No device manager available");
     }
 
     int startXCoord = 300;
@@ -74,7 +47,7 @@ public class ConfigurationPageController implements Initializable {
     if (!GUIValidator.validateNumberInput(randomCount.getText(), 0, 20)) return;
     int devicesCount = Integer.parseInt(randomCount.getText());
 
-    addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
+    deviceManager.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
   }
 
   public void handleAddSubnetAction(ActionEvent actionEvent) {
@@ -86,40 +59,11 @@ public class ConfigurationPageController implements Initializable {
     java.util.UUID operationUUID = java.util.UUID.randomUUID();
     OperationState.getInstance().setCurrentOperation(operationUUID);
 
-    addDeviceGroup(deviceCount, 300, 300, 60);
-    logicalWorkspace.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+    deviceManager.addDeviceGroup(deviceCount, 300, 300, 60);
+    deviceManager.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
 
-  private void addDeviceGroup(Integer count, Integer xCoord, Integer yCoord, Integer step) {
-
-    if (step == null) step = 60;
-    if (xCoord == null) xCoord = 300;
-    if (yCoord == null) yCoord = 300;
-    if (count == null) count = 10;
-
-    int rows = (int) Math.sqrt(count);
-    int cols = (count + rows - 1) / rows;
-
-    int deviceCount = 0;
-    for (int currentXCoord = xCoord;
-        currentXCoord < rows * step + xCoord;
-        currentXCoord = currentXCoord + step) {
-
-      for (int currentYCoord = yCoord;
-          currentYCoord < cols * step + yCoord;
-          currentYCoord = currentYCoord + step) {
-
-        if (deviceCount < count) {
-          logicalWorkspace.addDevice(
-              DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel(), currentXCoord, currentYCoord);
-
-          deviceCount++;
-        }
-      }
-    }
-  }
-
-  public void setLogicalWorkspace(LogicalWorkspace logicalWorkspace) {
-    this.logicalWorkspace = logicalWorkspace;
+  public void setDeviceManager(DeviceManager deviceManager) {
+    this.deviceManager = deviceManager;
   }
 }

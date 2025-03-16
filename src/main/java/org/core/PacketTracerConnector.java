@@ -41,17 +41,18 @@ public class PacketTracerConnector extends Application {
 
     Options options = networkFile.getOptions();
     options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
+    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
 
     EventManager eventManager = new EventManager(session);
-
-    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
     eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
     eventManager.registerAppWindowListener(appWindow);
+
+    DeviceManager deviceManager = new DeviceManager(logicalWorkspace);
 
     System.out.println(network.getDeviceCount());
     System.out.println("Connection to Packet Tracer Successful!");
 
-    GUIManager guiManager = new GUIManager(primaryStage, logicalWorkspace);
+    GUIManager guiManager = new GUIManager(primaryStage, deviceManager);
     guiManager.init();
   }
 

@@ -1,22 +1,22 @@
 package org.core.gui;
 
-import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.io.IOException;
 import java.net.URL;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.core.DeviceManager;
 import org.core.gui.controllers.MainController;
 
 public class GUIManager {
   Stage primaryStage;
   MainController mainController;
-  LogicalWorkspace logicalWorkspace;
+  DeviceManager deviceManager;
 
-  public GUIManager(Stage primaryStage, LogicalWorkspace logicalWorkspace) {
+  public GUIManager(Stage primaryStage, DeviceManager deviceManager) {
     this.primaryStage = primaryStage;
-    this.logicalWorkspace = logicalWorkspace;
+    this.deviceManager = deviceManager;
   }
 
   public void init() throws IOException {
@@ -30,7 +30,7 @@ public class GUIManager {
     Parent root = loader.load();
 
     mainController = loader.getController();
-    mainController.setLogicalWorkspace(logicalWorkspace);
+    mainController.setDeviceManager(deviceManager);
 
     Scene scene = new Scene(root, 1000, 700);
 

@@ -6,7 +6,7 @@ import java.util.UUID;
 public class OperationState {
   private static OperationState instance;
 
-  UUID currentOperationUUID;
+  UUID currentOperationUUID = null;
 
   Device[] devices;
   SubnetOperation[] subnetOperations;
