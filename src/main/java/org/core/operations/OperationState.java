@@ -1,14 +1,21 @@
 package org.core.operations;
 
 import com.cisco.pt.ipc.sim.Device;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import org.core.gui.mappers.DeviceMapper;
+import org.core.gui.models.DeviceGUIModel;
 
 public class OperationState {
   private static OperationState instance;
 
   UUID currentOperationUUID = null;
 
-  Device[] devices;
+  List<Device> devices = new ArrayList<>();
+  ObservableList<DeviceGUIModel> GUIDevices = FXCollections.observableArrayList();
   SubnetOperation[] subnetOperations;
 
   private OperationState() {}
@@ -27,5 +34,26 @@ public class OperationState {
 
   public void setCurrentOperation(UUID uuid) {
     currentOperationUUID = uuid;
+  }
+
+  public List<Device> getDevices() {
+    return devices;
+  }
+
+  public void pushDevice(Device device) {
+    devices.add(device);
+  }
+
+  public void removeFromDevices(Device device) {
+    devices.remove(device);
+  }
+
+  public ObservableList<DeviceGUIModel> getGUIDevices() {
+    return GUIDevices;
+  }
+
+  public void pushGUIDevice(Device device) {
+    GUIDevices.add(DeviceMapper.mapOneToGUIModel(device));
+    System.out.println(GUIDevices.size());
   }
 }

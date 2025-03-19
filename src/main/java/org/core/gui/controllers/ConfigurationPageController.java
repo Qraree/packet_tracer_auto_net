@@ -1,7 +1,6 @@
 package org.core.gui.controllers;
 
 import com.cisco.pt.ipc.enums.DeviceType;
-import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -44,7 +43,7 @@ public class ConfigurationPageController implements Initializable {
     int startYCoord = 300;
     int step = 60;
 
-    if (!GUIValidator.validateNumberInput(randomCount.getText(), 0, 20)) return;
+    if (GUIValidator.validateNumberInput(randomCount.getText(), 0, 20)) return;
     int devicesCount = Integer.parseInt(randomCount.getText());
 
     deviceManager.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
@@ -53,7 +52,7 @@ public class ConfigurationPageController implements Initializable {
   public void handleAddSubnetAction(ActionEvent actionEvent) {
     String selectedNetworkDevice = subnetNetworkDeviceChoice.getValue();
 
-    if (!GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
+    if (GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
     int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
 
     java.util.UUID operationUUID = java.util.UUID.randomUUID();

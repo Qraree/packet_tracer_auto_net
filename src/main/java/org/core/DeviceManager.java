@@ -1,16 +1,50 @@
 package org.core;
 
 import com.cisco.pt.ipc.enums.DeviceType;
+import com.cisco.pt.ipc.sim.Device;
+import com.cisco.pt.ipc.sim.Network;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import org.core.config.DeviceModelEnum;
+import org.core.operations.OperationState;
 
 public class DeviceManager {
   LogicalWorkspace logicalWorkspace;
+  Network network;
 
-  public DeviceManager(LogicalWorkspace logicalWorkspace) {
+  public DeviceManager(LogicalWorkspace logicalWorkspace, Network network) {
     this.logicalWorkspace = logicalWorkspace;
+    this.network = network;
+
+    getAllDevicesInit();
+  }
+
+  public void getAllDevicesInit() {
+    int deviceCount = network.getDeviceCount();
+
+    for (int i = 1; i < deviceCount; i++) {
+      Device device = network.getDeviceAt(i);
+      OperationState.getInstance().pushDevice(device);
+      OperationState.getInstance().pushGUIDevice(device);
+    }
+
+    List<Device> devices = OperationState.getInstance().getDevices();
+    System.out.println(devices.size());
+  }
+
+  public Device getDeviceAt(int index) {
+    try {
+      return network.getDeviceAt(index);
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Device getDeviceByName(String name) {
+    return network.getDevice(name);
   }
 
   public void addDevice(DeviceType deviceType, String model, int x, int y) {

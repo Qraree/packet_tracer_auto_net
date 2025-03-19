@@ -1,31 +1,53 @@
 package org.core.events.listeners;
 
 import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
+import com.cisco.pt.ipc.sim.Device;
 import java.util.UUID;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import org.core.DeviceManager;
 import org.core.events.EventListener;
 import org.core.operations.OperationState;
 
 public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
+
+  DeviceManager deviceManager;
+
+  public LogicalWorkspaceEventListener(DeviceManager deviceManager) {}
+
   @Override
   public void handleEvent(LogicalWorkspaceEvent event) {
     System.out.println(event.type);
     switch (event.type) {
       case DEVICE_ADDED:
-        System.out.println("Device added!!!");
+        LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
+
         UUID currentOperationUUID = OperationState.getInstance().getCurrentOperationUUID();
-        System.out.println("HEllo?!!!");
 
         if (currentOperationUUID == null) {
           System.out.println("No operation found");
           return;
         }
 
-        System.out.println("Current operation: " + currentOperationUUID.toString());
+        Device device = deviceManager.getDeviceByName(LWEvent.name);
+        OperationState.getInstance().pushDevice(device);
 
-        LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
+        Platform.runLater(
+            () -> {
+              OperationState.getInstance().pushGUIDevice(device);
+            });
 
-        System.out.println("Device type: " + LWEvent.type);
-        System.out.println("Device model: " + LWEvent.model);
+        Task<Void> task =
+            new Task<>() {
+              @Override
+              public Void call() {
+                OperationState.getInstance().pushGUIDevice(device);
+                return null;
+              }
+            };
+
+        new Thread(task).start();
+
         break;
       case DEVICE_REMOVED:
         assert event instanceof LogicalWorkspaceEvent.DeviceRemoved;
