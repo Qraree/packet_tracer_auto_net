@@ -4,7 +4,6 @@ import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
 import com.cisco.pt.ipc.sim.Device;
 import java.util.UUID;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import org.core.DeviceManager;
 import org.core.events.EventListener;
 import org.core.operations.OperationState;
@@ -13,7 +12,9 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
 
   DeviceManager deviceManager;
 
-  public LogicalWorkspaceEventListener(DeviceManager deviceManager) {}
+  public LogicalWorkspaceEventListener(DeviceManager deviceManager) {
+    this.deviceManager = deviceManager;
+  }
 
   @Override
   public void handleEvent(LogicalWorkspaceEvent event) {
@@ -23,30 +24,18 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
 
         UUID currentOperationUUID = OperationState.getInstance().getCurrentOperationUUID();
+        System.out.println("Current thread: " + Thread.currentThread().getName());
+
+        Device device = deviceManager.getDeviceByName(LWEvent.name);
+        System.out.println(device.getName());
+        OperationState.getInstance().pushDevice(device);
+
+        Platform.runLater(() -> OperationState.getInstance().pushGUIDevice(device));
 
         if (currentOperationUUID == null) {
           System.out.println("No operation found");
           return;
         }
-
-        Device device = deviceManager.getDeviceByName(LWEvent.name);
-        OperationState.getInstance().pushDevice(device);
-
-        Platform.runLater(
-            () -> {
-              OperationState.getInstance().pushGUIDevice(device);
-            });
-
-        Task<Void> task =
-            new Task<>() {
-              @Override
-              public Void call() {
-                OperationState.getInstance().pushGUIDevice(device);
-                return null;
-              }
-            };
-
-        new Thread(task).start();
 
         break;
       case DEVICE_REMOVED:
