@@ -23,14 +23,13 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
       case DEVICE_ADDED:
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
 
-        UUID currentOperationUUID = OperationState.getInstance().getCurrentOperationUUID();
-        System.out.println("Current thread: " + Thread.currentThread().getName());
-
         Device device = deviceManager.getDeviceByName(LWEvent.name);
         System.out.println(device.getName());
         OperationState.getInstance().pushDevice(device);
 
         Platform.runLater(() -> OperationState.getInstance().pushGUIDevice(device));
+
+        UUID currentOperationUUID = OperationState.getInstance().getCurrentOperationUUID();
 
         if (currentOperationUUID == null) {
           System.out.println("No operation found");
@@ -43,8 +42,11 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
         LogicalWorkspaceEvent.DeviceRemoved devRemovedEvent =
             (LogicalWorkspaceEvent.DeviceRemoved) event;
 
-        System.out.println("Event type: " + devRemovedEvent.type);
-        System.out.println("Device name: " + devRemovedEvent.name);
+        System.out.println("Current thread: " + Thread.currentThread().getName());
+
+        Platform.runLater(
+            () -> OperationState.getInstance().removeFromGUIDevices(devRemovedEvent.name));
+
         break;
       case LINK_CREATED:
         assert event instanceof LogicalWorkspaceEvent.LinkCreated;

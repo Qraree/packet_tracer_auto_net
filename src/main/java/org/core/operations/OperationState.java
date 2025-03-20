@@ -40,20 +40,31 @@ public class OperationState {
     return devices;
   }
 
-  public void pushDevice(Device device) {
-    devices.add(device);
-  }
-
-  public void removeFromDevices(Device device) {
-    devices.remove(device);
-  }
-
   public ObservableList<DeviceGUIModel> getGUIDevices() {
     return GUIDevices;
   }
 
+  public void pushDevice(Device device) {
+    devices.add(device);
+  }
+
+  public void removeFromDevices(String deviceName) {
+    for (Device device : devices) {
+      if (device.getName() == null) devices.remove(device);
+    }
+  }
+
   public void pushGUIDevice(Device device) {
     GUIDevices.add(DeviceMapper.mapOneToGUIModel(device));
+    System.out.println(GUIDevices.size());
+    System.out.println(devices.size());
+  }
+
+  public void removeFromGUIDevices(String deviceName) {
+    removeFromDevices(deviceName);
+    GUIDevices.removeIf(device -> device.getName().equals(deviceName));
+
+    System.out.println(devices.size());
     System.out.println(GUIDevices.size());
   }
 }
