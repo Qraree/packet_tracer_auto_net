@@ -1,8 +1,15 @@
 package org.core.gui.controllers;
 
+import com.cisco.pt.IPAddress;
+import com.cisco.pt.impl.IPAddressImpl;
 import com.cisco.pt.ipc.enums.DeviceType;
+import com.cisco.pt.ipc.sim.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
@@ -60,6 +67,58 @@ public class ConfigurationPageController implements Initializable {
 
     deviceManager.addDeviceGroup(deviceCount, 300, 300, 60);
     deviceManager.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+  }
+
+  public void configureReadyNetwork(ActionEvent actionEvent) {
+    ArrayList<Device> devices = deviceManager.getAllDevices();
+
+    ArrayList<Device> networkDevices =
+        devices.stream()
+            .filter(device -> device.getType() == DeviceType.SWITCH)
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    int subnetIndex = 2;
+    for (Device netDevice : networkDevices) {
+      System.out.println(netDevice.getName());
+      VLANManager vlanManager = (VLANManager) netDevice.getProcess("VlanManager");
+      vlanManager.addVlan(subnetIndex, "subnet_" + subnetIndex);
+
+      List<String> ports = netDevice.getPorts();
+
+      int pcIndex = 2;
+
+      for (String portName : ports) {
+        Cable link = null;
+        Port port = netDevice.getPort(portName);
+        link = (Cable) port.getLink();
+
+        if (link != null) {
+
+          if (port instanceof SwitchPort switchPort) {
+            switchPort.setAccessVlan(subnetIndex);
+          }
+
+          Device otherDevice = link.getPort1().getOwnerDevice();
+          System.out.println(otherDevice.getName());
+
+          boolean isPersonalDevice =
+              Arrays.asList(DeviceType.PC, DeviceType.LAPTOP).contains(otherDevice.getType());
+
+          if (isPersonalDevice) {
+            IPAddress defaultGatewayAddress = new IPAddressImpl("192.168.1.0");
+            IPAddress subnetMask = new IPAddressImpl("255.255.255.0");
+            IPAddress subnetAddress =
+                new IPAddressImpl("192.168." + (subnetIndex - 1) + "." + pcIndex);
+
+            HostPort hostPort = (HostPort) otherDevice.getPort("FastEthernet0");
+            hostPort.setIpSubnetMask(subnetAddress, subnetMask);
+            hostPort.setDefaultGateway(defaultGatewayAddress);
+            pcIndex++;
+          }
+        }
+      }
+      subnetIndex++;
+    }
   }
 
   public void setDeviceManager(DeviceManager deviceManager) {

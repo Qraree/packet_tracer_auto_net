@@ -36,7 +36,6 @@ public class PacketTracerConnector extends Application {
     AppWindow appWindow = ipc.appWindow();
     Network network = ipc.network();
 
-    appWindow.getRSSwitch().showSimulationMode();
     NetworkFile networkFile = appWindow.getActiveFile();
 
     Options options = networkFile.getOptions();

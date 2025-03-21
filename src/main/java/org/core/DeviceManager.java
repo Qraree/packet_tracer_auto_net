@@ -4,7 +4,7 @@ import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.Device;
 import com.cisco.pt.ipc.sim.Network;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
 import org.core.config.DeviceModelEnum;
@@ -29,9 +29,6 @@ public class DeviceManager {
       OperationState.getInstance().pushDevice(device);
       OperationState.getInstance().pushGUIDevice(device);
     }
-
-    List<Device> devices = OperationState.getInstance().getDevices();
-    System.out.println(devices.size());
   }
 
   public Device getDeviceAt(int index) {
@@ -41,6 +38,18 @@ public class DeviceManager {
       System.out.println(e.getMessage());
       throw new RuntimeException(e);
     }
+  }
+
+  public ArrayList<Device> getAllDevices() {
+    ArrayList<Device> allDevices = new ArrayList<>();
+    int deviceCount = network.getDeviceCount();
+
+    for (int i = 1; i < deviceCount; i++) {
+      Device device = network.getDeviceAt(i);
+      allDevices.add(device);
+    }
+
+    return allDevices;
   }
 
   public Device getDeviceByName(String name) {

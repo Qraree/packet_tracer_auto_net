@@ -50,21 +50,24 @@ public class OperationState {
 
   public void removeFromDevices(String deviceName) {
     for (Device device : devices) {
-      if (device.getName() == null) devices.remove(device);
+      if (device.getName() == null) {
+        devices.remove(device);
+        continue;
+      }
+
+      if (device.getName().equals(deviceName)) {
+        devices.remove(device);
+        break;
+      }
     }
   }
 
   public void pushGUIDevice(Device device) {
     GUIDevices.add(DeviceMapper.mapOneToGUIModel(device));
-    System.out.println(GUIDevices.size());
-    System.out.println(devices.size());
   }
 
   public void removeFromGUIDevices(String deviceName) {
-    removeFromDevices(deviceName);
+    //    removeFromDevices(deviceName);
     GUIDevices.removeIf(device -> device.getName().equals(deviceName));
-
-    System.out.println(devices.size());
-    System.out.println(GUIDevices.size());
   }
 }

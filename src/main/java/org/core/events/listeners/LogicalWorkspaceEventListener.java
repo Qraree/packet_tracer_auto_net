@@ -24,8 +24,7 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
 
         Device device = deviceManager.getDeviceByName(LWEvent.name);
-        System.out.println(device.getName());
-        OperationState.getInstance().pushDevice(device);
+        //        OperationState.getInstance().pushDevice(device);
 
         Platform.runLater(() -> OperationState.getInstance().pushGUIDevice(device));
 
@@ -41,8 +40,6 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
         assert event instanceof LogicalWorkspaceEvent.DeviceRemoved;
         LogicalWorkspaceEvent.DeviceRemoved devRemovedEvent =
             (LogicalWorkspaceEvent.DeviceRemoved) event;
-
-        System.out.println("Current thread: " + Thread.currentThread().getName());
 
         Platform.runLater(
             () -> OperationState.getInstance().removeFromGUIDevices(devRemovedEvent.name));
