@@ -88,9 +88,8 @@ public class ConfigurationPageController implements Initializable {
       int pcIndex = 2;
 
       for (String portName : ports) {
-        Cable link = null;
         Port port = netDevice.getPort(portName);
-        link = (Cable) port.getLink();
+        Cable link = (Cable) port.getLink();
 
         if (link != null) {
 
