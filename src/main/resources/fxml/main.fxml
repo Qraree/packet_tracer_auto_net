@@ -18,11 +18,11 @@
                 <VBox prefHeight="205.0" prefWidth="134.0">
                     <children>
                         <Button mnemonicParsing="false" onAction="#devicePage" prefHeight="33.0" prefWidth="131.0"
-                                style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;" text="Список устройств"
+                                style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;" text="Device list"
                                 textAlignment="CENTER"/>
                         <Button mnemonicParsing="false" onAction="#configurationPage" prefHeight="33.0"
                                 prefWidth="131.0" style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;"
-                                text="Конфигурация"/>
+                                text="Configuration"/>
                     </children>
                 </VBox>
             </children>

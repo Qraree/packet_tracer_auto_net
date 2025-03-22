@@ -12,23 +12,23 @@
                 <children>
                     <Button layoutX="18.0" layoutY="69.0" onAction="#handleAddRandomDeviceAction"
                             style="-fx-background-color: #798ed4;             -fx-border-color: #a1afb3;"
-                            text="Случайное устройство" textFill="WHITE"/>
+                            text="Random device" textFill="WHITE"/>
                     <Button layoutX="20.0" layoutY="149.0" mnemonicParsing="false"
                             onAction="#handleAddDevicesGroupAction" prefHeight="28.0" prefWidth="152.0"
-                            style="-fx-background-color: #798ed4; -fx-border-color: #a1afb3;" text="Группа компьютеров"
+                            style="-fx-background-color: #798ed4; -fx-border-color: #a1afb3;" text="Group of PC's"
                             textFill="WHITE"/>
-                    <Label layoutX="14.0" layoutY="121.0" text="Количество устройств в сети - "/>
+                    <Label layoutX="14.0" layoutY="121.0" text="Device count in network - "/>
                     <TextField fx:id="randomCount" layoutX="193.0" layoutY="115.0" prefHeight="28.0" prefWidth="75.0"/>
                     <Button layoutX="21.0" layoutY="364.0" mnemonicParsing="false" onAction="#handleAddSubnetAction"
-                            text="Добавить"/>
+                            text="Add"/>
                     <Separator layoutY="188.0" prefHeight="7.0" prefWidth="711.0"/>
-                    <Label layoutX="14.0" layoutY="209.0" text="Добавить подсеть">
+                    <Label layoutX="14.0" layoutY="209.0" text="Add subnet">
                         <font>
                             <Font name="Arial Bold" size="14.0"/>
                         </font>
                     </Label>
                     <TextField layoutX="68.0" layoutY="241.0" prefHeight="17.0" prefWidth="22.0"/>
-                    <Label layoutX="21.0" layoutY="245.0" text="Адрес - "/>
+                    <Label layoutX="21.0" layoutY="245.0" text="IPv4 address - "/>
                     <Label layoutX="96.0" layoutY="245.0" text="."/>
                     <TextField layoutX="104.0" layoutY="242.0" prefHeight="26.0" prefWidth="22.0"/>
                     <Label layoutX="132.0" layoutY="245.0" text="."/>
@@ -37,24 +37,24 @@
                     <TextField layoutX="182.0" layoutY="241.0" prefHeight="17.0" prefWidth="22.0"/>
                     <Label layoutX="170.0" layoutY="245.0" text="."/>
                     <TextField layoutX="222.0" layoutY="241.0" prefHeight="26.0" prefWidth="22.0"/>
-                    <Label layoutX="21.0" layoutY="277.0" text="Сетевое устройство - "/>
+                    <Label layoutX="21.0" layoutY="277.0" text="Network device - "/>
                     <ChoiceBox fx:id="subnetNetworkDeviceChoice" layoutX="156.0" layoutY="273.0" prefWidth="150.0"/>
-                    <Label layoutX="18.0" layoutY="323.0" text="Количество конечных устройств - "/>
+                    <Label layoutX="18.0" layoutY="323.0" text="End device count - "/>
                     <TextField fx:id="subnetDeviceCount" layoutX="222.0" layoutY="318.0" prefHeight="26.0"
                                prefWidth="63.0"/>
-                    <Label layoutX="18.0" layoutY="34.0" text="Добавить случайное устройство">
+                    <Label layoutX="18.0" layoutY="34.0" text="Add random device">
                         <font>
                             <Font name="Arial Bold" size="14.0"/>
                         </font>
                     </Label>
                     <Separator layoutX="4.0" layoutY="414.0" prefHeight="0.0" prefWidth="700.0"/>
-                    <Label layoutX="21.0" layoutY="434.0" text="Сконфигурировать готовую сеть">
+                    <Label layoutX="21.0" layoutY="434.0" text="Configure final network">
                         <font>
                             <Font name="Arial Bold" size="14.0"/>
                         </font>
                     </Label>
                     <Button onAction="#configureReadyNetwork" layoutX="21.0" layoutY="472.0" mnemonicParsing="false"
-                            prefHeight="26.0" prefWidth="158.0" style="-fx-background-color: #798ed4;" text="Настроить"
+                            prefHeight="26.0" prefWidth="158.0" style="-fx-background-color: #798ed4;" text="Configure"
                             textFill="WHITE"/>
                 </children>
             </AnchorPane>

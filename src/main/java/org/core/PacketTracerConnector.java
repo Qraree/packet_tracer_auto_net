@@ -25,33 +25,19 @@ import org.core.gui.GUIManager;
 public class PacketTracerConnector extends Application {
   private static final Logger logger = Logger.getLogger(PacketTracerConnector.class.getName());
 
+  private static final String ENV_SECRET = "SECRET";
+  private static final String ENV_AUTH_APP = "AUTH_APPLICATION";
+  private static final String ENV_URL = "URL";
+  private static final String ENV_PORT = "PORT";
+
   @Override
   public void start(Stage primaryStage) throws Exception {
 
     PacketTracerSession session = setupConnection();
-
-    IPCFactory ipcFactory = new IPCFactory(session);
-    IPC ipc = ipcFactory.getIPC();
-
-    AppWindow appWindow = ipc.appWindow();
-    Network network = ipc.network();
-
-    NetworkFile networkFile = appWindow.getActiveFile();
-
-    Options options = networkFile.getOptions();
-    options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
-    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
-
-    DeviceManager deviceManager = new DeviceManager(logicalWorkspace, network);
-
-    EventManager eventManager = new EventManager(session, deviceManager);
-    eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
-    eventManager.registerAppWindowListener(appWindow);
-
-    System.out.println("Connection to Packet Tracer Successful!");
-
-    GUIManager guiManager = new GUIManager(primaryStage, deviceManager);
-    guiManager.init();
+    IPC ipc = setupIPC(session);
+    DeviceManager deviceManager = setupNetwork(ipc);
+    registerListeners(ipc, session, deviceManager);
+    setupGUI(primaryStage, deviceManager);
   }
 
   public static void main(String[] args) {
@@ -63,15 +49,55 @@ public class PacketTracerConnector extends Application {
     }
   }
 
-  public static PacketTracerSession setupConnection() throws IOException {
+  private DeviceManager setupNetwork(IPC ipc) {
+    AppWindow appWindow = ipc.appWindow();
+    Network network = ipc.network();
+
+    configureNetworkOptions(appWindow);
+
+    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
+    return new DeviceManager(logicalWorkspace, network);
+  }
+
+  private IPC setupIPC(PacketTracerSession session) {
+    IPCFactory ipcFactory = new IPCFactory(session);
+
+    return ipcFactory.getIPC();
+  }
+
+  private void registerListeners(IPC ipc, PacketTracerSession session, DeviceManager deviceManager)
+      throws IOException {
+    AppWindow appWindow = ipc.appWindow();
+    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
+
+    EventManager eventManager = new EventManager(session, deviceManager);
+    eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
+    eventManager.registerAppWindowListener(appWindow);
+
+    logger.info("Connection to Packet Tracer Successful!");
+  }
+
+  private void configureNetworkOptions(AppWindow appWindow) {
+
+    NetworkFile networkFile = appWindow.getActiveFile();
+    Options options = networkFile.getOptions();
+    options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
+  }
+
+  private PacketTracerSession setupConnection() throws IOException {
     PacketTracerSessionFactory sessionFactory = PacketTracerSessionFactoryImpl.getInstance();
     ConnectionNegotiationProperties cnp = OptionsManager.getInstance().getConnectOpts();
 
     Map<String, String> env = System.getenv();
 
-    cnp.setAuthenticationSecret(env.get("SECRET"));
-    cnp.setAuthenticationApplication(env.get("AUTH_APPLICATION"));
+    cnp.setAuthenticationSecret(env.get(ENV_SECRET));
+    cnp.setAuthenticationApplication(env.get(ENV_AUTH_APP));
 
-    return sessionFactory.openSession(env.get("URL"), Integer.parseInt(env.get("PORT")), cnp);
+    return sessionFactory.openSession(env.get(ENV_URL), Integer.parseInt(env.get(ENV_PORT)), cnp);
+  }
+
+  private void setupGUI(Stage primaryStage, DeviceManager deviceManager) throws IOException {
+    GUIManager guiManager = new GUIManager(primaryStage, deviceManager);
+    guiManager.init();
   }
 }
