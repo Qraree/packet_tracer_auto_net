@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
-import org.core.services.DeviceService;
 
 public class MainController implements Initializable {
   private final String devicePagePath = "/fxml/device_page.fxml";
@@ -16,7 +15,6 @@ public class MainController implements Initializable {
 
   public DevicePageController deviceController;
   public ConfigurationPageController configurationController;
-  public DeviceService deviceService;
 
   @FXML private StackPane stackPane;
 
@@ -30,16 +28,11 @@ public class MainController implements Initializable {
   }
 
   public void devicePage() throws IOException {
-    FXMLLoader loader = loadStackPage(devicePagePath);
-
-    deviceController = loader.getController();
+    loadStackPage(devicePagePath);
   }
 
   public void configurationPage() throws IOException {
-    FXMLLoader loader = loadStackPage(configPagePath);
-
-    configurationController = loader.getController();
-    configurationController.setDeviceService(deviceService);
+    loadStackPage(configPagePath);
   }
 
   private FXMLLoader loadStackPage(String location) throws IOException {
@@ -56,9 +49,5 @@ public class MainController implements Initializable {
     stackPane.getChildren().setAll(root);
 
     return loader;
-  }
-
-  public void setDeviceManager(DeviceService deviceService) {
-    this.deviceService = deviceService;
   }
 }

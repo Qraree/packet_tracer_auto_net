@@ -9,21 +9,19 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.core.gui.controllers.MainController;
-import org.core.services.DeviceService;
 
 public class GUIManager {
   Stage primaryStage;
-  MainController mainController;
-  DeviceService deviceService;
 
-  public GUIManager(Stage primaryStage, DeviceService deviceService) {
+  public String mainPagePath = "/fxml/main_wrapper.fxml";
+
+  public GUIManager(Stage primaryStage) {
     this.primaryStage = primaryStage;
-    this.deviceService = deviceService;
   }
 
   public void init() throws IOException {
-    URL location = getClass().getResource("/fxml/main.fxml");
+
+    URL location = getClass().getResource(mainPagePath);
 
     if (location == null) {
       throw new RuntimeException("FXML file not found");
@@ -32,14 +30,11 @@ public class GUIManager {
     FXMLLoader loader = new FXMLLoader(location);
     Parent root = loader.load();
 
-    mainController = loader.getController();
-    mainController.setDeviceManager(deviceService);
-
     Scene scene = new Scene(root, 1000, 700);
+    primaryStage.setScene(scene);
 
     configureIcon(primaryStage);
     primaryStage.setTitle("PT Auto Network");
-    primaryStage.setScene(scene);
     primaryStage.setResizable(false);
     primaryStage.show();
 

@@ -7,26 +7,20 @@ import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
+import org.core.PacketTracerConnector;
 import org.core.config.DeviceModelEnum;
 import org.core.operations.OperationState;
 
 public class DeviceService {
-  LogicalWorkspace logicalWorkspace;
-  Network network;
+  public static LogicalWorkspace logicalWorkspace =
+      PacketTracerConnector.ipcInstance.appWindow().getActiveWorkspace().getLogicalWorkspace();
+  public static Network network = PacketTracerConnector.ipcInstance.network();
 
-  public DeviceService(LogicalWorkspace logicalWorkspace, Network network) {
-    this.logicalWorkspace = logicalWorkspace;
-    this.network = network;
-
-    getAllDevicesInit();
-  }
-
-  public void getAllDevicesInit() {
+  public static void getAllDevicesInit() {
     int deviceCount = network.getDeviceCount();
 
     for (int i = 1; i < deviceCount; i++) {
       Device device = network.getDeviceAt(i);
-      //      OperationState.getInstance().pushDevice(device);
       OperationState.getInstance().pushGUIDevice(device);
     }
   }
@@ -40,7 +34,7 @@ public class DeviceService {
     }
   }
 
-  public ArrayList<Device> getAllDevices() {
+  public static ArrayList<Device> getAllDevices() {
     ArrayList<Device> allDevices = new ArrayList<>();
     int deviceCount = network.getDeviceCount();
 
@@ -52,15 +46,15 @@ public class DeviceService {
     return allDevices;
   }
 
-  public Device getDeviceByName(String name) {
+  public static Device getDeviceByName(String name) {
     return network.getDevice(name);
   }
 
-  public void addDevice(DeviceType deviceType, String model, int x, int y) {
+  public static void addDevice(DeviceType deviceType, String model, int x, int y) {
     logicalWorkspace.addDevice(deviceType, model, x, y);
   }
 
-  public void addRandomDevice(Integer xBoundary, Integer yBoundary) {
+  public static void addRandomDevice(Integer xBoundary, Integer yBoundary) {
     if (logicalWorkspace == null) {
       throw new RuntimeException("No logical workspace available");
     }
@@ -87,7 +81,7 @@ public class DeviceService {
         randomYCoordinate);
   }
 
-  public void addDeviceGroup(Integer count, Integer xCoord, Integer yCoord, Integer step) {
+  public static void addDeviceGroup(Integer count, Integer xCoord, Integer yCoord, Integer step) {
     if (logicalWorkspace == null) {
       throw new RuntimeException("No logical workspace available");
     }

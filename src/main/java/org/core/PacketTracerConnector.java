@@ -3,12 +3,10 @@ package org.core;
 import com.cisco.pt.impl.OptionsManager;
 import com.cisco.pt.ipc.IPCFactory;
 import com.cisco.pt.ipc.enums.BufferFullAction;
-import com.cisco.pt.ipc.sim.Network;
 import com.cisco.pt.ipc.system.NetworkFile;
 import com.cisco.pt.ipc.system.Options;
 import com.cisco.pt.ipc.ui.AppWindow;
 import com.cisco.pt.ipc.ui.IPC;
-import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import com.cisco.pt.ptmp.ConnectionNegotiationProperties;
 import com.cisco.pt.ptmp.PacketTracerSession;
 import com.cisco.pt.ptmp.PacketTracerSessionFactory;
@@ -31,14 +29,12 @@ public class PacketTracerConnector extends Application {
   private static final String ENV_URL = "URL";
   private static final String ENV_PORT = "PORT";
 
+  public static IPC ipcInstance;
+
   @Override
   public void start(Stage primaryStage) throws Exception {
-
-    PacketTracerSession session = setupConnection();
-    IPC ipc = setupIPC(session);
-    DeviceService deviceService = setupNetwork(ipc);
-    registerListeners(ipc, session, deviceService);
-    setupGUI(primaryStage, deviceService);
+    setupPacketTracer();
+    setupGUI(primaryStage);
   }
 
   public static void main(String[] args) {
@@ -46,46 +42,22 @@ public class PacketTracerConnector extends Application {
       launch();
     } catch (Exception e) {
       logger.log(Level.SEVERE, "An error occurred: ", e);
-      System.out.println("Error connecting to Packet Tracer.");
     }
   }
 
-  private DeviceService setupNetwork(IPC ipc) {
-    AppWindow appWindow = ipc.appWindow();
-    Network network = ipc.network();
-
-    configureNetworkOptions(appWindow);
-
-    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
-    return new DeviceService(logicalWorkspace, network);
+  public static void setupPacketTracer() throws IOException {
+    try {
+      PacketTracerSession session = setupConnection();
+      ipcInstance = setupIPC(session);
+      setupNetwork();
+      registerListeners(session);
+    } catch (Error e) {
+      logger.log(Level.SEVERE, "Packet Tracer is not running!");
+    }
   }
 
-  private IPC setupIPC(PacketTracerSession session) {
-    IPCFactory ipcFactory = new IPCFactory(session);
+  private static PacketTracerSession setupConnection() throws IOException {
 
-    return ipcFactory.getIPC();
-  }
-
-  private void registerListeners(IPC ipc, PacketTracerSession session, DeviceService deviceService)
-      throws IOException {
-    AppWindow appWindow = ipc.appWindow();
-    LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
-
-    EventManager eventManager = new EventManager(session, deviceService);
-    eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
-    eventManager.registerAppWindowListener(appWindow);
-
-    logger.info("Connection to Packet Tracer Successful!");
-  }
-
-  private void configureNetworkOptions(AppWindow appWindow) {
-
-    NetworkFile networkFile = appWindow.getActiveFile();
-    Options options = networkFile.getOptions();
-    options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
-  }
-
-  private PacketTracerSession setupConnection() throws IOException {
     PacketTracerSessionFactory sessionFactory = PacketTracerSessionFactoryImpl.getInstance();
     ConnectionNegotiationProperties cnp = OptionsManager.getInstance().getConnectOpts();
 
@@ -97,8 +69,31 @@ public class PacketTracerConnector extends Application {
     return sessionFactory.openSession(env.get(ENV_URL), Integer.parseInt(env.get(ENV_PORT)), cnp);
   }
 
-  private void setupGUI(Stage primaryStage, DeviceService deviceService) throws IOException {
-    GUIManager guiManager = new GUIManager(primaryStage, deviceService);
+  private static IPC setupIPC(PacketTracerSession session) {
+    IPCFactory ipcFactory = new IPCFactory(session);
+    return ipcFactory.getIPC();
+  }
+
+  private static void setupNetwork() {
+    AppWindow appWindow = ipcInstance.appWindow();
+    NetworkFile networkFile = appWindow.getActiveFile();
+    Options options = networkFile.getOptions();
+    options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
+
+    DeviceService.getAllDevicesInit();
+  }
+
+  private static void registerListeners(PacketTracerSession session) throws IOException {
+    new EventManager(session, ipcInstance);
+    logger.info("Connection to Packet Tracer Successful!");
+  }
+
+  private void setupGUI(Stage primaryStage) throws IOException {
+    GUIManager guiManager = new GUIManager(primaryStage);
     guiManager.init();
+  }
+
+  public static boolean isPacketSessionRunning() {
+    return ipcInstance != null;
   }
 }

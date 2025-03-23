@@ -18,7 +18,6 @@ public class ConfigurationPageController implements Initializable {
   public TextField randomCount;
   public TextField subnetDeviceCount;
   public ChoiceBox<String> subnetNetworkDeviceChoice;
-  public DeviceService deviceService;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -32,14 +31,10 @@ public class ConfigurationPageController implements Initializable {
   }
 
   public void handleAddRandomDeviceAction() {
-    deviceService.addRandomDevice(1000, 500);
+    DeviceService.addRandomDevice(1000, 500);
   }
 
   public void handleAddDevicesGroupAction() {
-
-    if (deviceService == null) {
-      throw new RuntimeException("No device manager available");
-    }
 
     int startXCoord = 300;
     int startYCoord = 300;
@@ -48,7 +43,7 @@ public class ConfigurationPageController implements Initializable {
     if (GUIValidator.validateNumberInput(randomCount.getText(), 0, 20)) return;
     int devicesCount = Integer.parseInt(randomCount.getText());
 
-    deviceService.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
+    DeviceService.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
   }
 
   public void handleAddSubnetAction() {
@@ -60,16 +55,12 @@ public class ConfigurationPageController implements Initializable {
     java.util.UUID operationUUID = java.util.UUID.randomUUID();
     OperationState.getInstance().setCurrentOperation(operationUUID);
 
-    deviceService.addDeviceGroup(deviceCount, 300, 300, 60);
-    deviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+    DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
+    DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
 
   public void configureFinalNetwork() {
-    ArrayList<Device> devices = deviceService.getAllDevices();
+    ArrayList<Device> devices = DeviceService.getAllDevices();
     NetworkConfigurationService.configureFinalNetwork(devices);
-  }
-
-  public void setDeviceService(DeviceService deviceService) {
-    this.deviceService = deviceService;
   }
 }

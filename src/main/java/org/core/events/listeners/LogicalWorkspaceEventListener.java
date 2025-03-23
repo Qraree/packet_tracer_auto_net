@@ -10,11 +10,7 @@ import org.core.services.DeviceService;
 
 public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
 
-  DeviceService deviceService;
-
-  public LogicalWorkspaceEventListener(DeviceService deviceService) {
-    this.deviceService = deviceService;
-  }
+  public LogicalWorkspaceEventListener() {}
 
   @Override
   public void handleEvent(LogicalWorkspaceEvent event) {
@@ -24,8 +20,7 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
         System.out.println("Device added " + LWEvent.model);
 
-        Device device = deviceService.getDeviceByName(LWEvent.name);
-        //        OperationState.getInstance().pushDevice(device);
+        Device device = DeviceService.getDeviceByName(LWEvent.name);
 
         Platform.runLater(() -> OperationState.getInstance().pushGUIDevice(device));
 
