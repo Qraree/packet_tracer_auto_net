@@ -1,4 +1,4 @@
-package org.core;
+package org.core.services;
 
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.Device;
@@ -10,11 +10,11 @@ import java.util.function.Function;
 import org.core.config.DeviceModelEnum;
 import org.core.operations.OperationState;
 
-public class DeviceManager {
+public class DeviceService {
   LogicalWorkspace logicalWorkspace;
   Network network;
 
-  public DeviceManager(LogicalWorkspace logicalWorkspace, Network network) {
+  public DeviceService(LogicalWorkspace logicalWorkspace, Network network) {
     this.logicalWorkspace = logicalWorkspace;
     this.network = network;
 
@@ -26,7 +26,7 @@ public class DeviceManager {
 
     for (int i = 1; i < deviceCount; i++) {
       Device device = network.getDeviceAt(i);
-      OperationState.getInstance().pushDevice(device);
+      //      OperationState.getInstance().pushDevice(device);
       OperationState.getInstance().pushGUIDevice(device);
     }
   }
@@ -69,8 +69,8 @@ public class DeviceManager {
     if (yBoundary == null) yBoundary = 500;
 
     Object[][] DevicesArray = {
-      {DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel()},
-      {DeviceType.PC, DeviceModelEnum.PC.getModel()}
+      {DeviceModelEnum.LAPTOP.getDeviceType(), DeviceModelEnum.LAPTOP.getModel()},
+      {DeviceModelEnum.PC.getDeviceType(), DeviceModelEnum.PC.getModel()}
     };
     Random random = new Random();
 
@@ -111,7 +111,10 @@ public class DeviceManager {
 
         if (deviceCount < count) {
           logicalWorkspace.addDevice(
-              DeviceType.LAPTOP, DeviceModelEnum.LAPTOP.getModel(), currentXCoord, currentYCoord);
+              DeviceModelEnum.LAPTOP.getDeviceType(),
+              DeviceModelEnum.LAPTOP.getModel(),
+              currentXCoord,
+              currentYCoord);
 
           deviceCount++;
         }

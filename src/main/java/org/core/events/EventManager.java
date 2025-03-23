@@ -8,24 +8,24 @@ import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import com.cisco.pt.ptmp.PacketTracerSession;
 import java.io.IOException;
 import java.util.List;
-import org.core.DeviceManager;
 import org.core.config.Constants;
 import org.core.events.listeners.AppWindowEventListener;
 import org.core.events.listeners.LogicalWorkspaceEventListener;
+import org.core.services.DeviceService;
 
 public class EventManager {
 
   IPCEventManager ipcEventManager;
   PacketTracerSession session;
-  DeviceManager deviceManager;
+  DeviceService deviceService;
 
   LogicalWorkspaceEventRegistry LWRegistry;
   AppWindowEventRegistry AWRegistry;
 
-  public EventManager(PacketTracerSession session, DeviceManager deviceManager) {
+  public EventManager(PacketTracerSession session, DeviceService deviceService) {
     this.session = session;
     this.ipcEventManager = session.getEventManager();
-    this.deviceManager = deviceManager;
+    this.deviceService = deviceService;
 
     this.LWRegistry = ipcEventManager.getLogicalWorkspaceEvents();
     this.AWRegistry = ipcEventManager.getAppWindowEvents();
@@ -35,7 +35,7 @@ public class EventManager {
       throws IOException {
     List<String> LWCallbackList = Constants.LWCallbackList;
 
-    LogicalWorkspaceEventListener LWListener = new LogicalWorkspaceEventListener(deviceManager);
+    LogicalWorkspaceEventListener LWListener = new LogicalWorkspaceEventListener(deviceService);
     LWRegistry.addSpecificListenerFiltered(
         LWListener::handleEvent, logicalWorkspace, LWCallbackList);
   }

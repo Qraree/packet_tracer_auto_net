@@ -9,17 +9,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.core.DeviceManager;
 import org.core.gui.controllers.MainController;
+import org.core.services.DeviceService;
 
 public class GUIManager {
   Stage primaryStage;
   MainController mainController;
-  DeviceManager deviceManager;
+  DeviceService deviceService;
 
-  public GUIManager(Stage primaryStage, DeviceManager deviceManager) {
+  public GUIManager(Stage primaryStage, DeviceService deviceService) {
     this.primaryStage = primaryStage;
-    this.deviceManager = deviceManager;
+    this.deviceService = deviceService;
   }
 
   public void init() throws IOException {
@@ -33,7 +33,7 @@ public class GUIManager {
     Parent root = loader.load();
 
     mainController = loader.getController();
-    mainController.setDeviceManager(deviceManager);
+    mainController.setDeviceManager(deviceService);
 
     Scene scene = new Scene(root, 1000, 700);
 

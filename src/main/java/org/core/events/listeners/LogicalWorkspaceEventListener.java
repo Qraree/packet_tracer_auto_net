@@ -4,16 +4,16 @@ import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
 import com.cisco.pt.ipc.sim.Device;
 import java.util.UUID;
 import javafx.application.Platform;
-import org.core.DeviceManager;
 import org.core.events.EventListener;
 import org.core.operations.OperationState;
+import org.core.services.DeviceService;
 
 public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
 
-  DeviceManager deviceManager;
+  DeviceService deviceService;
 
-  public LogicalWorkspaceEventListener(DeviceManager deviceManager) {
-    this.deviceManager = deviceManager;
+  public LogicalWorkspaceEventListener(DeviceService deviceService) {
+    this.deviceService = deviceService;
   }
 
   @Override
@@ -22,8 +22,9 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
     switch (event.type) {
       case DEVICE_ADDED:
         LogicalWorkspaceEvent.DeviceAdded LWEvent = (LogicalWorkspaceEvent.DeviceAdded) event;
+        System.out.println("Device added " + LWEvent.model);
 
-        Device device = deviceManager.getDeviceByName(LWEvent.name);
+        Device device = deviceService.getDeviceByName(LWEvent.name);
         //        OperationState.getInstance().pushDevice(device);
 
         Platform.runLater(() -> OperationState.getInstance().pushGUIDevice(device));

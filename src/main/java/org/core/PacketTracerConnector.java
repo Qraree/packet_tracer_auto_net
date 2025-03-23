@@ -21,6 +21,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.core.events.EventManager;
 import org.core.gui.GUIManager;
+import org.core.services.DeviceService;
 
 public class PacketTracerConnector extends Application {
   private static final Logger logger = Logger.getLogger(PacketTracerConnector.class.getName());
@@ -35,9 +36,9 @@ public class PacketTracerConnector extends Application {
 
     PacketTracerSession session = setupConnection();
     IPC ipc = setupIPC(session);
-    DeviceManager deviceManager = setupNetwork(ipc);
-    registerListeners(ipc, session, deviceManager);
-    setupGUI(primaryStage, deviceManager);
+    DeviceService deviceService = setupNetwork(ipc);
+    registerListeners(ipc, session, deviceService);
+    setupGUI(primaryStage, deviceService);
   }
 
   public static void main(String[] args) {
@@ -49,14 +50,14 @@ public class PacketTracerConnector extends Application {
     }
   }
 
-  private DeviceManager setupNetwork(IPC ipc) {
+  private DeviceService setupNetwork(IPC ipc) {
     AppWindow appWindow = ipc.appWindow();
     Network network = ipc.network();
 
     configureNetworkOptions(appWindow);
 
     LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
-    return new DeviceManager(logicalWorkspace, network);
+    return new DeviceService(logicalWorkspace, network);
   }
 
   private IPC setupIPC(PacketTracerSession session) {
@@ -65,12 +66,12 @@ public class PacketTracerConnector extends Application {
     return ipcFactory.getIPC();
   }
 
-  private void registerListeners(IPC ipc, PacketTracerSession session, DeviceManager deviceManager)
+  private void registerListeners(IPC ipc, PacketTracerSession session, DeviceService deviceService)
       throws IOException {
     AppWindow appWindow = ipc.appWindow();
     LogicalWorkspace logicalWorkspace = appWindow.getActiveWorkspace().getLogicalWorkspace();
 
-    EventManager eventManager = new EventManager(session, deviceManager);
+    EventManager eventManager = new EventManager(session, deviceService);
     eventManager.registerLogicalWorkspaceListener(logicalWorkspace);
     eventManager.registerAppWindowListener(appWindow);
 
@@ -96,8 +97,8 @@ public class PacketTracerConnector extends Application {
     return sessionFactory.openSession(env.get(ENV_URL), Integer.parseInt(env.get(ENV_PORT)), cnp);
   }
 
-  private void setupGUI(Stage primaryStage, DeviceManager deviceManager) throws IOException {
-    GUIManager guiManager = new GUIManager(primaryStage, deviceManager);
+  private void setupGUI(Stage primaryStage, DeviceService deviceService) throws IOException {
+    GUIManager guiManager = new GUIManager(primaryStage, deviceService);
     guiManager.init();
   }
 }

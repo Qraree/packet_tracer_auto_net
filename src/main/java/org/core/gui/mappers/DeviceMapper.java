@@ -3,6 +3,7 @@ package org.core.gui.mappers;
 import com.cisco.pt.ipc.sim.Device;
 import java.util.ArrayList;
 import java.util.List;
+import org.core.config.DeviceModelEnum;
 import org.core.gui.models.DeviceGUIModel;
 
 public class DeviceMapper {
@@ -14,7 +15,8 @@ public class DeviceMapper {
     for (Device device : devices) {
       String name = device.getName();
       String model = device.getModel();
-      DeviceGUIModel GUIDevice = new DeviceGUIModel(name, model, "/images/router.png");
+      DeviceGUIModel GUIDevice =
+          new DeviceGUIModel(name, model, DeviceModelEnum.getIconPathByModel(model));
       deviceGUIModels.add(GUIDevice);
     }
 
@@ -26,6 +28,6 @@ public class DeviceMapper {
     String name = device.getName();
     String model = device.getModel();
 
-    return new DeviceGUIModel(name, model, "/images/router.png");
+    return new DeviceGUIModel(name, model, DeviceModelEnum.getIconPathByModel(model));
   }
 }

@@ -1,29 +1,26 @@
 package org.core.gui.controllers;
 
-import com.cisco.pt.IPAddress;
-import com.cisco.pt.impl.IPAddressImpl;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.*;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import org.core.DeviceManager;
 import org.core.config.DeviceModelEnum;
 import org.core.gui.GUIValidator;
 import org.core.operations.OperationState;
+import org.core.services.DeviceService;
+import org.core.services.NetworkConfigurationService;
 
 public class ConfigurationPageController implements Initializable {
   public TextField randomCount;
   public TextField subnetDeviceCount;
   public ChoiceBox<String> subnetNetworkDeviceChoice;
-  public DeviceManager deviceManager;
+  public DeviceService deviceService;
+  public NetworkConfigurationService networkConfigurationService;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -37,12 +34,12 @@ public class ConfigurationPageController implements Initializable {
   }
 
   public void handleAddRandomDeviceAction() {
-    deviceManager.addRandomDevice(1000, 500);
+    deviceService.addRandomDevice(1000, 500);
   }
 
   public void handleAddDevicesGroupAction() {
 
-    if (deviceManager == null) {
+    if (deviceService == null) {
       throw new RuntimeException("No device manager available");
     }
 
@@ -53,7 +50,7 @@ public class ConfigurationPageController implements Initializable {
     if (GUIValidator.validateNumberInput(randomCount.getText(), 0, 20)) return;
     int devicesCount = Integer.parseInt(randomCount.getText());
 
-    deviceManager.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
+    deviceService.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
   }
 
   public void handleAddSubnetAction(ActionEvent actionEvent) {
@@ -65,90 +62,16 @@ public class ConfigurationPageController implements Initializable {
     java.util.UUID operationUUID = java.util.UUID.randomUUID();
     OperationState.getInstance().setCurrentOperation(operationUUID);
 
-    deviceManager.addDeviceGroup(deviceCount, 300, 300, 60);
-    deviceManager.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+    deviceService.addDeviceGroup(deviceCount, 300, 300, 60);
+    deviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
 
   public void configureReadyNetwork(ActionEvent actionEvent) {
-    ArrayList<Device> devices = deviceManager.getAllDevices();
-
-    ArrayList<Device> networkDevices =
-        devices.stream()
-            .filter(device -> device.getType() == DeviceType.SWITCH)
-            .collect(Collectors.toCollection(ArrayList::new));
-
-    int subnetIndex = 2;
-    for (Device netDevice : networkDevices) {
-      System.out.println(netDevice.getName());
-      VLANManager vlanManager = (VLANManager) netDevice.getProcess("VlanManager");
-      vlanManager.addVlan(subnetIndex, "subnet_" + subnetIndex);
-
-      List<String> ports = netDevice.getPorts();
-
-      int pcIndex = 2;
-
-      for (String portName : ports) {
-        Port port = netDevice.getPort(portName);
-        Cable link = (Cable) port.getLink();
-
-        if (link != null) {
-
-          if (port instanceof SwitchPort switchPort) {
-            switchPort.setAccessVlan(subnetIndex);
-          }
-
-          // dto router fix
-          Port otherPort = link.getPort1();
-          Port netDevicePort = link.getPort2();
-          Device otherDevice = otherPort.getOwnerDevice();
-          Device netDevicce = netDevicePort.getOwnerDevice();
-          String PortName = netDevicce.getName();
-
-          System.out.println(netDevicce.getName());
-
-          boolean isPersonalDevice =
-              Arrays.asList(DeviceType.PC, DeviceType.LAPTOP).contains(otherDevice.getType());
-
-          if (isPersonalDevice) {
-            IPAddress defaultGatewayAddress =
-                new IPAddressImpl("192.168." + (subnetIndex - 1) + ".1");
-            IPAddress subnetMask = new IPAddressImpl("255.255.255.0");
-            IPAddress subnetAddress =
-                new IPAddressImpl("192.168." + (subnetIndex - 1) + "." + pcIndex);
-
-            HostPort hostPort = (HostPort) otherDevice.getPort("FastEthernet0");
-            hostPort.setIpSubnetMask(subnetAddress, subnetMask);
-            hostPort.setDefaultGateway(defaultGatewayAddress);
-            pcIndex++;
-          }
-
-          boolean isRouterDevice = otherDevice.getType() == DeviceType.ROUTER;
-
-          if (isRouterDevice
-              && otherDevice instanceof Router router
-              && otherPort instanceof RouterPort routerPort) {
-
-            System.out.println("Router " + router.getName() + " " + routerPort.getName());
-
-            if (port instanceof SwitchPort switchPort) {
-              switchPort.setAccessPort(false);
-            }
-
-            routerPort.setPower(true);
-            router.addSubInt(PortName, subnetIndex);
-            router.changePortEncapsulation(PortName, "dot1Q");
-
-            IPAddress subnetMask = new IPAddressImpl("255.255.255.0");
-            IPAddress subnetAddress = new IPAddressImpl("192.168." + (subnetIndex - 1) + ".1");
-            routerPort.setIpSubnetMask(subnetAddress, subnetMask);
-          }
-        }
-      }
-      subnetIndex++;
-    }
+    ArrayList<Device> devices = deviceService.getAllDevices();
+    NetworkConfigurationService.configureFinalNetwork(devices);
   }
 
-  public void setDeviceManager(DeviceManager deviceManager) {
-    this.deviceManager = deviceManager;
+  public void setDeviceService(DeviceService deviceService) {
+    this.deviceService = deviceService;
   }
 }
