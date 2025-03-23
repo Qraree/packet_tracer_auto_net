@@ -5,7 +5,6 @@ import com.cisco.pt.ipc.sim.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
@@ -20,7 +19,6 @@ public class ConfigurationPageController implements Initializable {
   public TextField subnetDeviceCount;
   public ChoiceBox<String> subnetNetworkDeviceChoice;
   public DeviceService deviceService;
-  public NetworkConfigurationService networkConfigurationService;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -53,7 +51,7 @@ public class ConfigurationPageController implements Initializable {
     deviceService.addDeviceGroup(devicesCount, startXCoord, startYCoord, step);
   }
 
-  public void handleAddSubnetAction(ActionEvent actionEvent) {
+  public void handleAddSubnetAction() {
     String selectedNetworkDevice = subnetNetworkDeviceChoice.getValue();
 
     if (GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
@@ -66,7 +64,7 @@ public class ConfigurationPageController implements Initializable {
     deviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
 
-  public void configureReadyNetwork(ActionEvent actionEvent) {
+  public void configureFinalNetwork() {
     ArrayList<Device> devices = deviceService.getAllDevices();
     NetworkConfigurationService.configureFinalNetwork(devices);
   }

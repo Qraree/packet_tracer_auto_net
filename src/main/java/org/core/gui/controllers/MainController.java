@@ -3,7 +3,6 @@ package org.core.gui.controllers;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,6 +11,9 @@ import javafx.scene.layout.StackPane;
 import org.core.services.DeviceService;
 
 public class MainController implements Initializable {
+  private final String devicePagePath = "/fxml/device_page.fxml";
+  private final String configPagePath = "/fxml/configuration_page.fxml";
+
   public DevicePageController deviceController;
   public ConfigurationPageController configurationController;
   public DeviceService deviceService;
@@ -21,21 +23,20 @@ public class MainController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     try {
-      loadStackPage("/fxml/device_page.fxml");
+      loadStackPage(devicePagePath);
     } catch (IOException ex) {
       ex.printStackTrace();
     }
   }
 
-  public void devicePage(ActionEvent actionEvent) throws IOException {
-    FXMLLoader loader = loadStackPage("/fxml/device_page.fxml");
+  public void devicePage() throws IOException {
+    FXMLLoader loader = loadStackPage(devicePagePath);
 
     deviceController = loader.getController();
-    deviceController.setDeviceManager(deviceService);
   }
 
-  public void configurationPage(ActionEvent actionEvent) throws IOException {
-    FXMLLoader loader = loadStackPage("/fxml/configuration_page.fxml");
+  public void configurationPage() throws IOException {
+    FXMLLoader loader = loadStackPage(configPagePath);
 
     configurationController = loader.getController();
     configurationController.setDeviceService(deviceService);

@@ -53,7 +53,7 @@
                             <Font name="Arial Bold" size="14.0"/>
                         </font>
                     </Label>
-                    <Button onAction="#configureReadyNetwork" layoutX="21.0" layoutY="472.0" mnemonicParsing="false"
+                    <Button onAction="#configureFinalNetwork" layoutX="21.0" layoutY="472.0" mnemonicParsing="false"
                             prefHeight="26.0" prefWidth="158.0" style="-fx-background-color: #798ed4;" text="Configure"
                             textFill="WHITE"/>
                 </children>
