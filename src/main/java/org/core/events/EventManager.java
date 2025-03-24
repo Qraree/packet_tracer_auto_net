@@ -11,7 +11,6 @@ import java.util.List;
 import org.core.config.Constants;
 import org.core.events.listeners.AppWindowEventListener;
 import org.core.events.listeners.LogicalWorkspaceEventListener;
-import org.core.events.listeners.WorkspaceEventListener;
 
 public class EventManager {
 
@@ -38,7 +37,6 @@ public class EventManager {
 
     registerLogicalWorkspaceListener(logicalWorkspace);
     registerAppWindowListener(appWindow);
-    registerWorkspaceListener(workspace);
   }
 
   public void registerLogicalWorkspaceListener(LogicalWorkspace logicalWorkspace)
@@ -55,13 +53,5 @@ public class EventManager {
 
     AppWindowEventListener AWListener = new AppWindowEventListener();
     AWRegistry.addSpecificListenerFiltered(AWListener::handleEvent, appWindow, AWCallbackList);
-  }
-
-  public void registerWorkspaceListener(Workspace workspace) throws IOException {
-    List<String> WorkspaceCallbackList = Constants.WorkspaceCallbackList;
-
-    WorkspaceEventListener WorkspaceListener = new WorkspaceEventListener();
-    WorkspaceRegistry.addSpecificListenerFiltered(
-        WorkspaceListener::handleEvent, workspace, WorkspaceCallbackList);
   }
 }
