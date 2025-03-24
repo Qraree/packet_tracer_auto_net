@@ -3,7 +3,7 @@ package org.core.gui.controllers;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.core.gui.models.DeviceGUIModel;
+import org.core.models.NetworkNode;
 
 public class DeviceCardController {
 
@@ -11,7 +11,7 @@ public class DeviceCardController {
   public Label deviceName;
   public Label deviceDescription;
 
-  public void setDevice(DeviceGUIModel device) {
+  public void setDevice(NetworkNode device) {
     deviceImage.setImage(new Image(device.getImagePath()));
     deviceName.setText(device.getName());
     deviceDescription.setText(device.getDescription());

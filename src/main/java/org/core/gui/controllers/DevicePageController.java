@@ -6,15 +6,15 @@ import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import org.core.gui.cells.DeviceCardCell;
-import org.core.gui.models.DeviceGUIModel;
-import org.core.operations.OperationState;
+import org.core.models.GlobalNetwork;
+import org.core.models.NetworkNode;
 
 public class DevicePageController implements Initializable {
-  public ListView<DeviceGUIModel> listview;
+  public ListView<NetworkNode> listview;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    ObservableList<DeviceGUIModel> devices = OperationState.getInstance().getGUIDevices();
+    ObservableList<NetworkNode> devices = GlobalNetwork.getInstance().getNetworkNodes();
     listview.setItems(devices);
     listview.setCellFactory(p -> new DeviceCardCell());
   }

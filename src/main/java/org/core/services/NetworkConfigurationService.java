@@ -4,8 +4,6 @@ import com.cisco.pt.IPAddress;
 import com.cisco.pt.impl.IPAddressImpl;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.*;
-import com.cisco.pt.ipc.ui.IPC;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +38,17 @@ public class NetworkConfigurationService {
             switchPort.setAccessVlan(subnetIndex);
           }
 
-          // dto router fix
-          Port otherPort = link.getPort1();
-          Port netDevicePort = link.getPort2();
+          Port otherPort;
+          Port netDevicePort;
+
+          if (port.getObjectUUID() == link.getPort1().getObjectUUID()) {
+            otherPort = link.getPort2();
+            netDevicePort = link.getPort1();
+          } else {
+            otherPort = link.getPort1();
+            netDevicePort = link.getPort2();
+          }
+
           Device otherDevice = otherPort.getOwnerDevice();
           Device netDevicce = netDevicePort.getOwnerDevice();
           String PortName = netDevicce.getName();

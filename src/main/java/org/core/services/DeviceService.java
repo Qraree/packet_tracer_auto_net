@@ -2,36 +2,35 @@ package org.core.services;
 
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.Device;
-import com.cisco.pt.ipc.sim.Network;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.core.PacketTracerConnector;
 import org.core.config.DeviceModelEnum;
-import org.core.operations.OperationState;
+import org.core.models.GlobalNetwork;
 
 public class DeviceService {
+  private static final Logger logger = Logger.getLogger(DeviceService.class.getName());
+
   public static LogicalWorkspace logicalWorkspace =
       PacketTracerConnector.ipcInstance.appWindow().getActiveWorkspace().getLogicalWorkspace();
-  public static Network network = PacketTracerConnector.ipcInstance.network();
+  public static com.cisco.pt.ipc.sim.Network network = PacketTracerConnector.ipcInstance.network();
 
-  public static void getAllDevicesInit() {
+  public static void setupNetworkNodes() {
     int deviceCount = network.getDeviceCount();
+    ArrayList<Device> devices = new ArrayList<>();
 
     for (int i = 1; i < deviceCount; i++) {
       Device device = network.getDeviceAt(i);
-      OperationState.getInstance().pushGUIDevice(device);
+      devices.add(device);
     }
-  }
 
-  public Device getDeviceAt(int index) {
-    try {
-      return network.getDeviceAt(index);
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-      throw new RuntimeException(e);
-    }
+    GlobalNetwork.getInstance().setupNetworkNodes(devices);
+    //    GlobalNetwork.getInstance().setNodesConnections();
+    logger.log(Level.FINE, "Setup network nodes");
   }
 
   public static ArrayList<Device> getAllDevices() {

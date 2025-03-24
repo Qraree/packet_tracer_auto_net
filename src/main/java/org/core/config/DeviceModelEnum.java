@@ -3,11 +3,12 @@ package org.core.config;
 import com.cisco.pt.ipc.enums.DeviceType;
 
 public enum DeviceModelEnum {
-  // todo model и device type
   LAPTOP("Laptop-PT", DeviceType.LAPTOP, "/images/laptop.png"),
   PC("PC-PT", DeviceType.PC, "/images/pc.jpg"),
   SWITCH_2960_24TT("2960-24TT", DeviceType.MULTI_LAYER_SWITCH, "/images/switch.jpg"),
-  SWITCH_3560_24PS("3560-24PS", DeviceType.MULTI_LAYER_SWITCH, "/images/switch_l3.png");
+  SWITCH_3560_24PS("3560-24PS", DeviceType.MULTI_LAYER_SWITCH, "/images/switch_l3.png"),
+  SWITCH_2950_24("2950-24", DeviceType.SWITCH, "/images/switch.jpg"),
+  ROUTER1841("1841", DeviceType.ROUTER, "/images/router.png");
 
   private final String model;
   private final DeviceType deviceType;

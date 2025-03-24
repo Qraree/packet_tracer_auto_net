@@ -5,16 +5,21 @@ import com.cisco.pt.ipc.sim.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import org.core.config.DeviceModelEnum;
 import org.core.gui.GUIValidator;
-import org.core.operations.OperationState;
+import org.core.models.GlobalNetwork;
 import org.core.services.DeviceService;
 import org.core.services.NetworkConfigurationService;
 
 public class ConfigurationPageController implements Initializable {
+  private static final Logger logger =
+      Logger.getLogger(ConfigurationPageController.class.getName());
+
   public TextField randomCount;
   public TextField subnetDeviceCount;
   public ChoiceBox<String> subnetNetworkDeviceChoice;
@@ -53,14 +58,16 @@ public class ConfigurationPageController implements Initializable {
     int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
 
     java.util.UUID operationUUID = java.util.UUID.randomUUID();
-    OperationState.getInstance().setCurrentOperation(operationUUID);
+    GlobalNetwork.getInstance().setCurrentOperation(operationUUID);
 
     DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
     DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
 
   public void configureFinalNetwork() {
+    logger.log(Level.INFO, "Configuring final network");
     ArrayList<Device> devices = DeviceService.getAllDevices();
     NetworkConfigurationService.configureFinalNetwork(devices);
+    logger.log(Level.FINE, "Network configuration finished");
   }
 }

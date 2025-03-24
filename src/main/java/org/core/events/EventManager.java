@@ -22,15 +22,13 @@ public class EventManager {
   AppWindowEventRegistry AWRegistry;
   WorkspaceEventRegistry WorkspaceRegistry;
 
-  public EventManager(PacketTracerSession session, IPC ipc) throws IOException {
+  public EventManager(PacketTracerSession session) throws IOException {
     this.session = session;
     this.ipcEventManager = session.getEventManager();
 
     this.LWRegistry = ipcEventManager.getLogicalWorkspaceEvents();
     this.AWRegistry = ipcEventManager.getAppWindowEvents();
     this.WorkspaceRegistry = ipcEventManager.getWorkspaceEvents();
-
-    registerListeners(ipc);
   }
 
   public void registerListeners(IPC ipc) throws IOException {

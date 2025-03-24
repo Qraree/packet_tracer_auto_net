@@ -80,11 +80,12 @@ public class PacketTracerConnector extends Application {
     Options options = networkFile.getOptions();
     options.setBufferFullAction(BufferFullAction.AUTO_CLEAR_EVENT_LIST);
 
-    DeviceService.getAllDevicesInit();
+    DeviceService.setupNetworkNodes();
   }
 
   private static void registerListeners(PacketTracerSession session) throws IOException {
-    new EventManager(session, ipcInstance);
+    EventManager eventManager = new EventManager(session);
+    eventManager.registerListeners(ipcInstance);
     logger.info("Connection to Packet Tracer Successful!");
   }
 
