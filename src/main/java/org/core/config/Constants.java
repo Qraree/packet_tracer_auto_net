@@ -16,9 +16,4 @@ public class Constants {
           IPCEventConstants.APP_WINDOW_APP_EXIT,
           IPCEventConstants.APP_WINDOW_FILE_CLOSING,
           IPCEventConstants.APP_WINDOW_FILE_NEWED);
-
-  public static final List<String> WorkspaceCallbackList =
-      Arrays.asList(
-          IPCEventConstants.WORKSPACE_DEVICE_TYPE_SELECTED,
-          IPCEventConstants.WORKSPACE_DEVICE_TYPE_DESELECTED);
 }
