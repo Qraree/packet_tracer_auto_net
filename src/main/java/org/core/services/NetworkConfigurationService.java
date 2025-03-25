@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.collections.ObservableList;
+import org.core.config.Constants;
+import org.core.models.NetworkNode;
+import org.core.models.NetworkNodeConnection;
 
 public class NetworkConfigurationService {
 
@@ -91,6 +95,57 @@ public class NetworkConfigurationService {
             IPAddress subnetAddress = new IPAddressImpl("192.168." + (subnetIndex - 1) + ".1");
             routerPort.setIpSubnetMask(subnetAddress, subnetMask);
           }
+        }
+      }
+      subnetIndex++;
+    }
+  }
+
+  public static void configFinalNetworkRandomV2(ObservableList<NetworkNode> networkNodes) {
+
+    ArrayList<NetworkNode> networkDevices =
+        networkNodes.stream()
+            .filter(node -> Constants.networkDeviceTypes.contains(node.getStringType()))
+            .filter(node -> !node.getConnections().isEmpty())
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    int subnetIndex = 2;
+    String privateSubnetPrefix = "192.168.";
+    String subnetNamePrefix = "subnet_";
+
+    for (NetworkNode networkDeviceNode : networkDevices) {
+      VLANManager vlanManager =
+          (VLANManager) networkDeviceNode.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
+      vlanManager.addVlan(subnetIndex, subnetNamePrefix + subnetIndex);
+
+      ArrayList<NetworkNodeConnection> nodeConnections = networkDeviceNode.getConnections();
+
+      int endDeviceIndex = 2;
+
+      for (NetworkNodeConnection nodeConnection : nodeConnections) {
+        NetworkNode connectedNode = nodeConnection.getConnectedNode();
+        boolean isEndDevice = Constants.endDeviceTypes.contains(connectedNode.getStringType());
+
+        if (nodeConnection.connectedPort instanceof RoutedSwitchPort switchPort) {
+          switchPort.setSwitchPort(true);
+        }
+
+        if (nodeConnection.connectedPort instanceof SwitchPort switchPort) {
+          switchPort.setAccessPort(true);
+          switchPort.setAccessVlan(subnetIndex);
+        }
+
+        if (isEndDevice) {
+          IPAddress defaultGatewayAddress =
+              new IPAddressImpl(privateSubnetPrefix + (subnetIndex - 1) + ".1");
+          IPAddress subnetMask = new IPAddressImpl(Constants.DEFAULT_SUBNET_MASK);
+          IPAddress subnetAddress =
+              new IPAddressImpl(privateSubnetPrefix + (subnetIndex - 1) + "." + endDeviceIndex);
+
+          HostPort hostPort = (HostPort) nodeConnection.getOtherPort();
+          hostPort.setIpSubnetMask(subnetAddress, subnetMask);
+          hostPort.setDefaultGateway(defaultGatewayAddress);
+          endDeviceIndex++;
         }
       }
       subnetIndex++;

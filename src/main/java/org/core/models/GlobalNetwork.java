@@ -38,8 +38,8 @@ public class GlobalNetwork {
     Port firstPort = firstNode.getDevice().getPort(portName1);
     Port secondPort = secondNode.getDevice().getPort(portName2);
 
-    firstNode.setConnection(secondNode, firstPort);
-    firstNode.setConnection(firstNode, secondPort);
+    firstNode.setConnection(secondNode, firstPort, secondPort);
+    firstNode.setConnection(firstNode, secondPort, firstPort);
   }
 
   public void setNodesConnections() {
@@ -61,8 +61,8 @@ public class GlobalNetwork {
 
           boolean isConnectionAlreadyExists = node.checkForExistingConnection(otherNode);
           if (!isConnectionAlreadyExists) {
-            node.setConnection(otherNode, port);
-            otherNode.setConnection(node, otherPort);
+            node.setConnection(otherNode, port, otherPort);
+            otherNode.setConnection(node, otherPort, port);
           }
         }
       }
@@ -79,10 +79,6 @@ public class GlobalNetwork {
     }
 
     return ((Cable) link).getPort2();
-  }
-
-  public UUID getCurrentOperationUUID() {
-    return currentOperationUUID;
   }
 
   public void setCurrentOperation(UUID uuid) {

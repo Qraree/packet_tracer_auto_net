@@ -14,6 +14,6 @@ public class DeviceCardController {
   public void setDevice(NetworkNode device) {
     deviceImage.setImage(new Image(device.getImagePath()));
     deviceName.setText(device.getName());
-    deviceDescription.setText(device.getDescription());
+    deviceDescription.setText(device.getModel());
   }
 }

@@ -1,5 +1,6 @@
 package org.core.gui.mappers;
 
+import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.Device;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,10 @@ public class DeviceMapper {
     for (Device device : devices) {
       String name = device.getName();
       String model = device.getModel();
+      DeviceType type = device.getType();
+
       NetworkNode GUIDevice =
-          new NetworkNode(name, model, DeviceModelEnum.getIconPathByModel(model), device);
+          new NetworkNode(name, model, DeviceModelEnum.getIconPathByModel(model), device, type);
       networkNodes.add(GUIDevice);
     }
 
@@ -27,7 +30,8 @@ public class DeviceMapper {
 
     String name = device.getName();
     String model = device.getModel();
+    DeviceType type = device.getType();
 
-    return new NetworkNode(name, model, DeviceModelEnum.getIconPathByModel(model), device);
+    return new NetworkNode(name, model, DeviceModelEnum.getIconPathByModel(model), device, type);
   }
 }

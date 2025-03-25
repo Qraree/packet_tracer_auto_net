@@ -29,7 +29,7 @@ public class DeviceService {
     }
 
     GlobalNetwork.getInstance().setupNetworkNodes(devices);
-    //    GlobalNetwork.getInstance().setNodesConnections();
+    GlobalNetwork.getInstance().setNodesConnections();
     logger.log(Level.FINE, "Setup network nodes");
   }
 
