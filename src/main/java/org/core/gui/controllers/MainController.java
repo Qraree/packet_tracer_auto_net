@@ -13,9 +13,6 @@ public class MainController implements Initializable {
   private final String devicePagePath = "/fxml/device_page.fxml";
   private final String configPagePath = "/fxml/configuration_page.fxml";
 
-  public DevicePageController deviceController;
-  public ConfigurationPageController configurationController;
-
   @FXML private StackPane stackPane;
 
   @Override

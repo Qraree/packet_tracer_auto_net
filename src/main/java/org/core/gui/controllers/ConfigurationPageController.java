@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import org.core.config.DeviceModelEnum;
 import org.core.gui.GUIValidator;
 import org.core.models.GlobalNetwork;
+import org.core.models.NetworkNode;
 import org.core.services.DeviceService;
 import org.core.services.NetworkConfigurationService;
 
@@ -57,9 +59,6 @@ public class ConfigurationPageController implements Initializable {
     if (GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
     int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
 
-    java.util.UUID operationUUID = java.util.UUID.randomUUID();
-    GlobalNetwork.getInstance().setCurrentOperation(operationUUID);
-
     DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
     DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
@@ -68,6 +67,13 @@ public class ConfigurationPageController implements Initializable {
     logger.log(Level.INFO, "Configuring final network");
     ArrayList<Device> devices = DeviceService.getAllDevices();
     NetworkConfigurationService.configureFinalNetwork(devices);
+    logger.log(Level.FINE, "Network configuration finished");
+  }
+
+  public void configureFinalNetworkRandomV2() {
+    logger.log(Level.INFO, "Configuring final network");
+    ObservableList<NetworkNode> networkNodes = GlobalNetwork.getInstance().getNetworkNodes();
+    NetworkConfigurationService.configFinalNetworkRandomV2(networkNodes);
     logger.log(Level.FINE, "Network configuration finished");
   }
 }
