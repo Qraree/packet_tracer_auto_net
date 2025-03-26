@@ -126,16 +126,12 @@ public class NetworkConfigurationService {
         NetworkNode connectedNode = nodeConnection.getConnectedNode();
         boolean isEndDevice = Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
 
-        if (nodeConnection.connectedPort instanceof RoutedSwitchPort switchPort) {
-          switchPort.setSwitchPort(true);
-        }
-
-        if (nodeConnection.connectedPort instanceof SwitchPort switchPort) {
-          switchPort.setAccessPort(true);
-          switchPort.setAccessVlan(subnetIndex);
-        }
-
         if (isEndDevice) {
+          if (nodeConnection.connectedPort instanceof SwitchPort switchPort) {
+            switchPort.setAccessPort(true);
+            switchPort.setAccessVlan(subnetIndex);
+          }
+
           IPAddress defaultGatewayAddress =
               new IPAddressImpl(privateSubnetPrefix + (subnetIndex - 1) + ".1");
           IPAddress subnetMask = new IPAddressImpl(Constants.DEFAULT_SUBNET_MASK);
@@ -159,10 +155,34 @@ public class NetworkConfigurationService {
             .collect(Collectors.toCollection(ArrayList::new));
 
     for (NetworkNode switchNode : multilayerSwitches) {
-      ArrayList<NetworkNodeConnection> nodeConnections = switchNode.getConnections();
+      TerminalLine terminalLine = switchNode.getDevice().getCommandLine();
+      String prompt = terminalLine.getPrompt();
+      System.out.println("PROMPT " + prompt);
+
+      String mode = terminalLine.getMode();
+
+      // todo clean
+      if (mode.isEmpty()) {
+        terminalLine.enterCommand("no");
+      }
+
+      mode = terminalLine.getMode();
+
+      if (mode.equals("user")) {
+        terminalLine.enterCommand("enable");
+      }
+
+      mode = terminalLine.getMode();
+      if (mode.equals("enable")) {
+        terminalLine.enterCommand("configure terminal");
+      }
+
+      // todo add trunks commands
+      terminalLine.enterCommand("ip routing");
 
       configureMultiLayerVlan(switchNode, switchNode);
 
+      ArrayList<NetworkNodeConnection> nodeConnections = switchNode.getConnections();
       for (NetworkNodeConnection nodeConnection : nodeConnections) {
         NetworkNode connectedNode = nodeConnection.getConnectedNode();
 
@@ -204,6 +224,21 @@ public class NetworkConfigurationService {
             new IPAddressImpl("192.168." + (currentVlan.getVlanNumber() - 1) + ".1");
 
         vlanInterface.setIpSubnetMask(subnetAddress, subnetMask);
+
+        if (nodeForVlan.getName().equals(multiLayerNode.getName())) {
+          TerminalLine terminalLine = multiLayerNode.getDevice().getCommandLine();
+          for (NetworkNodeConnection nodeConnection : multiLayerNode.getConnections()) {
+            NetworkNode connectedNode = nodeConnection.getConnectedNode();
+
+            boolean isEndDevice =
+                Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
+            if (isEndDevice) {
+              Port connectedPort = nodeConnection.getConnectedPort();
+              terminalLine.enterCommand("interface " + connectedPort.getName());
+              terminalLine.enterCommand("switchport access vlan " + currentVlan.getVlanNumber());
+            }
+          }
+        }
       }
     }
   }
