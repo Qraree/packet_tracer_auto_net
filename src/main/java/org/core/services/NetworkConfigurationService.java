@@ -114,6 +114,7 @@ public class NetworkConfigurationService {
     String subnetNamePrefix = "subnet_";
 
     for (NetworkNode networkDeviceNode : networkDevices) {
+      setupConfigureTerminalMode(networkDeviceNode);
       VLANManager vlanManager =
           (VLANManager) networkDeviceNode.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
       vlanManager.addVlan(subnetIndex, subnetNamePrefix + subnetIndex);
@@ -124,9 +125,10 @@ public class NetworkConfigurationService {
 
       for (NetworkNodeConnection nodeConnection : nodeConnections) {
         NetworkNode connectedNode = nodeConnection.getConnectedNode();
-        boolean isEndDevice = Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
+        boolean isConnectedToEndDevice =
+            Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
 
-        if (isEndDevice) {
+        if (isConnectedToEndDevice) {
           if (nodeConnection.connectedPort instanceof SwitchPort switchPort) {
             switchPort.setAccessPort(true);
             switchPort.setAccessVlan(subnetIndex);
@@ -143,6 +145,15 @@ public class NetworkConfigurationService {
           hostPort.setDefaultGateway(defaultGatewayAddress);
           endDeviceIndex++;
         }
+
+        boolean isConnectedToNetworkDevice =
+            Constants.NETWORK_DEVICE_TYPES.contains(connectedNode.getStringType());
+        if (isConnectedToNetworkDevice) {
+          setupConfigureTerminalMode(networkDeviceNode);
+          TerminalLine terminalLine = networkDeviceNode.getDevice().getCommandLine();
+          terminalLine.enterCommand("interface " + nodeConnection.getConnectedPort().getName());
+          terminalLine.enterCommand(Constants.TERMINAL_SWITCH_TO_TRUNK_COMMAND);
+        }
       }
       subnetIndex++;
     }
@@ -155,31 +166,7 @@ public class NetworkConfigurationService {
             .collect(Collectors.toCollection(ArrayList::new));
 
     for (NetworkNode switchNode : multilayerSwitches) {
-      TerminalLine terminalLine = switchNode.getDevice().getCommandLine();
-      String prompt = terminalLine.getPrompt();
-      System.out.println("PROMPT " + prompt);
-
-      String mode = terminalLine.getMode();
-
-      // todo clean
-      if (mode.isEmpty()) {
-        terminalLine.enterCommand("no");
-      }
-
-      mode = terminalLine.getMode();
-
-      if (mode.equals("user")) {
-        terminalLine.enterCommand("enable");
-      }
-
-      mode = terminalLine.getMode();
-      if (mode.equals("enable")) {
-        terminalLine.enterCommand("configure terminal");
-      }
-
-      // todo add trunks commands
-      terminalLine.enterCommand("ip routing");
-
+      setupConfigureTerminalMode(switchNode);
       configureMultiLayerVlan(switchNode, switchNode);
 
       ArrayList<NetworkNodeConnection> nodeConnections = switchNode.getConnections();
@@ -192,6 +179,31 @@ public class NetworkConfigurationService {
         }
       }
     }
+  }
+
+  private static void setupConfigureTerminalMode(NetworkNode switchNode) {
+    assert Constants.NETWORK_DEVICE_TYPES.contains(switchNode.getStringType());
+
+    TerminalLine terminalLine = switchNode.getDevice().getCommandLine();
+
+    String mode = terminalLine.getMode();
+
+    if (mode.isEmpty()) {
+      terminalLine.enterCommand(Constants.TERMINAL_NO_RESPONSE);
+    }
+
+    mode = terminalLine.getMode();
+
+    if (mode.equals(Constants.TERMINAL_USER_MODE)) {
+      terminalLine.enterCommand(Constants.TERMINAL_ENABLE_RESPONSE);
+    }
+
+    mode = terminalLine.getMode();
+    if (mode.equals(Constants.TERMINAL_ENABLE_MODE)) {
+      terminalLine.enterCommand(Constants.TERMINAL_CONFIG_RESPONSE);
+    }
+
+    terminalLine.enterCommand(Constants.TERMINAL_IP_ROUTING_COMMAND);
   }
 
   private static void configureMultiLayerVlan(NetworkNode nodeForVlan, NetworkNode multiLayerNode) {

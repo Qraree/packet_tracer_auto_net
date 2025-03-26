@@ -6,14 +6,12 @@ import com.cisco.pt.ipc.sim.Link;
 import com.cisco.pt.ipc.sim.Port;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.core.gui.mappers.DeviceMapper;
 
 public class GlobalNetwork {
   private static GlobalNetwork instance;
-  UUID currentOperationUUID = null;
   ObservableList<NetworkNode> networkNodes = FXCollections.observableArrayList();
 
   private GlobalNetwork() {}
@@ -39,7 +37,21 @@ public class GlobalNetwork {
     Port secondPort = secondNode.getDevice().getPort(portName2);
 
     firstNode.setConnection(secondNode, firstPort, secondPort);
-    firstNode.setConnection(firstNode, secondPort, firstPort);
+    secondNode.setConnection(firstNode, secondPort, firstPort);
+  }
+
+  public void deleteNodeConnections(
+      String deviceName1, String deviceName2, String portName1, String portName2) {
+    NetworkNode firstNode = getNodeByName(deviceName1);
+    NetworkNode secondNode = getNodeByName(deviceName2);
+
+    firstNode.deleteConnection(secondNode);
+    secondNode.deleteConnection(firstNode);
+  }
+
+  public void deleteAllNodeConnections(String deviceName) {
+    NetworkNode node = getNodeByName(deviceName);
+    node.deleteAllConnections();
   }
 
   public void setNodesConnections() {
@@ -79,10 +91,6 @@ public class GlobalNetwork {
     }
 
     return ((Cable) link).getPort2();
-  }
-
-  public void setCurrentOperation(UUID uuid) {
-    currentOperationUUID = uuid;
   }
 
   public ObservableList<NetworkNode> getNetworkNodes() {

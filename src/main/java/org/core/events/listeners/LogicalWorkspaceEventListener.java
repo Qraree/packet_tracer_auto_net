@@ -13,6 +13,7 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
 
   @Override
   public void handleEvent(LogicalWorkspaceEvent event) {
+    GlobalNetwork globalNetwork = GlobalNetwork.getInstance();
     System.out.println(event.type);
     switch (event.type) {
       case LINK_CREATED:
@@ -25,12 +26,11 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
 
         Platform.runLater(
             () -> {
-              GlobalNetwork.getInstance()
-                  .createNodesConnection(
-                      linkCreateEvent.deviceName1,
-                      linkCreateEvent.deviceName2,
-                      linkCreateEvent.portName1,
-                      linkCreateEvent.portName2);
+              globalNetwork.createNodesConnection(
+                  linkCreateEvent.deviceName1,
+                  linkCreateEvent.deviceName2,
+                  linkCreateEvent.portName1,
+                  linkCreateEvent.portName2);
             });
 
         System.out.println("First device: " + linkCreateEvent.deviceName1);
@@ -45,7 +45,7 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
         System.out.println("Device added " + LWEvent.model);
 
         Device device = DeviceService.getDeviceByName(LWEvent.name);
-        Platform.runLater(() -> GlobalNetwork.getInstance().createNetworkNode(device));
+        Platform.runLater(() -> globalNetwork.createNetworkNode(device));
 
         break;
       case DEVICE_REMOVED:
@@ -54,13 +54,24 @@ public class LogicalWorkspaceEventListener implements EventListener<LogicalWorks
             (LogicalWorkspaceEvent.DeviceRemoved) event;
 
         Platform.runLater(
-            () -> GlobalNetwork.getInstance().deleteNetworkNode(devRemovedEvent.name));
-
+            () -> {
+              globalNetwork.deleteAllNodeConnections(devRemovedEvent.name);
+              globalNetwork.deleteNetworkNode(devRemovedEvent.name);
+            });
         break;
-
       case LINK_DELETED:
         assert event instanceof LogicalWorkspaceEvent.LinkDeleted;
+        LogicalWorkspaceEvent.LinkDeleted linkDeletedEvent =
+            (LogicalWorkspaceEvent.LinkDeleted) event;
         System.out.println("Link deleted");
+        Platform.runLater(
+            () ->
+                globalNetwork.deleteNodeConnections(
+                    linkDeletedEvent.deviceName1,
+                    linkDeletedEvent.deviceName2,
+                    linkDeletedEvent.portName1,
+                    linkDeletedEvent.portName2));
+
         break;
       case LINK_STARTED:
         assert event instanceof LogicalWorkspaceEvent.LinkStarted;
