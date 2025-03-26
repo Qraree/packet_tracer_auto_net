@@ -20,9 +20,12 @@
                         <Button mnemonicParsing="false" onAction="#devicePage" prefHeight="33.0" prefWidth="131.0"
                                 style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;" text="Device list"
                                 textAlignment="CENTER"/>
-                        <Button mnemonicParsing="false" onAction="#configurationPage" prefHeight="33.0"
+                        <Button mnemonicParsing="false" onAction="#addDevicePage" prefHeight="33.0"
                                 prefWidth="131.0" style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;"
-                                text="Configuration"/>
+                                text="Add device"/>
+                        <Button mnemonicParsing="false" onAction="#configurationPage" prefHeight="32.0"
+                                prefWidth="132.0"
+                                style="-fx-background-color: #fff; -fx-border-color: #b5b8bd;" text="Configuration"/>
                     </children>
                 </VBox>
             </children>
