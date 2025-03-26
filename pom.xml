@@ -16,19 +16,12 @@
         <javafx.version>21</javafx.version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
         <javafx.fmlx.version>20</javafx.fmlx.version>
+        <!--        <javapackager.version>1.7.6</javapackager.version>-->
     </properties>
 
 
     <build>
         <plugins>
-            <!--            <plugin>-->
-            <!--                <groupId>org.codehaus.mojo</groupId>-->
-            <!--                <artifactId>exec-maven-plugin</artifactId>-->
-            <!--                <version>1.2.1</version>-->
-            <!--                <configuration>-->
-            <!--                    <mainClass>org.core.PacketTracerConnector</mainClass>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
 
             <plugin>
                 <groupId>org.openjfx</groupId>
@@ -38,6 +31,22 @@
                     <mainClass>org.core.PacketTracerConnector</mainClass>
                 </configuration>
             </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>io.github.fvarrui</groupId>-->
+            <!--                <artifactId>javapackager</artifactId>-->
+            <!--                <version>${javapackager.version}</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>package</goal>-->
+            <!--                        </goals>-->
+            <!--                        <configuration>-->
+            <!--                            <mainClass>org.core.PacketTracerConnector</mainClass>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 
