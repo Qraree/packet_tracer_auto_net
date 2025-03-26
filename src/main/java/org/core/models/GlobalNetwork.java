@@ -57,7 +57,7 @@ public class GlobalNetwork {
           Device otherDevice = otherPort.getOwnerDevice();
           NetworkNode otherNode = getNodeByName(otherDevice.getName());
 
-          if (otherNode.getName().equals(node.getName())) break;
+          if (otherNode.getName().equals(node.getName())) continue;
 
           boolean isConnectionAlreadyExists = node.checkForExistingConnection(otherNode);
           if (!isConnectionAlreadyExists) {

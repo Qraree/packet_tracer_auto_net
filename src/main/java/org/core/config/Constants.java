@@ -19,14 +19,19 @@ public class Constants {
           IPCEventConstants.APP_WINDOW_FILE_CLOSING,
           IPCEventConstants.APP_WINDOW_FILE_NEWED);
 
-  public static final ArrayList<String> networkDeviceTypes =
+  public static final ArrayList<String> NETWORK_DEVICE_TYPES =
       new ArrayList<>(
           Arrays.asList(
               DeviceType.SWITCH.toString(),
               DeviceType.MULTI_LAYER_SWITCH.toString(),
               DeviceType.SWITCH3650.toString()));
 
-  public static final ArrayList<String> endDeviceTypes =
+  public static final ArrayList<String> MULTILAYER_SWITCH_TYPES =
+      new ArrayList<>(
+          Arrays.asList(
+              DeviceType.MULTI_LAYER_SWITCH.toString(), DeviceType.SWITCH3650.toString()));
+
+  public static final ArrayList<String> END_DEVICE_TYPES =
       new ArrayList<>(Arrays.asList(DeviceType.PC.toString(), DeviceType.LAPTOP.toString()));
 
   public static final String DEFAULT_SUBNET_MASK = "255.255.255.0";

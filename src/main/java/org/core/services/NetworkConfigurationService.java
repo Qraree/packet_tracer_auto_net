@@ -105,7 +105,7 @@ public class NetworkConfigurationService {
 
     ArrayList<NetworkNode> networkDevices =
         networkNodes.stream()
-            .filter(node -> Constants.networkDeviceTypes.contains(node.getStringType()))
+            .filter(node -> Constants.NETWORK_DEVICE_TYPES.contains(node.getStringType()))
             .filter(node -> !node.getConnections().isEmpty())
             .collect(Collectors.toCollection(ArrayList::new));
 
@@ -124,7 +124,7 @@ public class NetworkConfigurationService {
 
       for (NetworkNodeConnection nodeConnection : nodeConnections) {
         NetworkNode connectedNode = nodeConnection.getConnectedNode();
-        boolean isEndDevice = Constants.endDeviceTypes.contains(connectedNode.getStringType());
+        boolean isEndDevice = Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
 
         if (nodeConnection.connectedPort instanceof RoutedSwitchPort switchPort) {
           switchPort.setSwitchPort(true);
@@ -149,6 +149,62 @@ public class NetworkConfigurationService {
         }
       }
       subnetIndex++;
+    }
+
+    // network Layer Configuration
+    ArrayList<NetworkNode> multilayerSwitches =
+        networkNodes.stream()
+            .filter(node -> Constants.MULTILAYER_SWITCH_TYPES.contains(node.getStringType()))
+            .filter(node -> !node.getConnections().isEmpty())
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    for (NetworkNode switchNode : multilayerSwitches) {
+      ArrayList<NetworkNodeConnection> nodeConnections = switchNode.getConnections();
+
+      configureMultiLayerVlan(switchNode, switchNode);
+
+      for (NetworkNodeConnection nodeConnection : nodeConnections) {
+        NetworkNode connectedNode = nodeConnection.getConnectedNode();
+
+        boolean isConnectedToSwitch = connectedNode.getType() == DeviceType.SWITCH;
+        if (isConnectedToSwitch) {
+          configureMultiLayerVlan(connectedNode, switchNode);
+        }
+      }
+    }
+  }
+
+  private static void configureMultiLayerVlan(NetworkNode nodeForVlan, NetworkNode multiLayerNode) {
+    int defaultVlanNumber = 1;
+    int serviceVlanNumber = 1002;
+
+    VLANManager connectedNodeVlanManager =
+        (VLANManager) nodeForVlan.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
+
+    VLANManager multiLayerSwitchVlanManager =
+        (VLANManager) multiLayerNode.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
+
+    int vlanCount = connectedNodeVlanManager.getVlanCount();
+    for (int index = 0; index < vlanCount; index++) {
+      VLAN currentVlan = connectedNodeVlanManager.getVlanAt(index);
+
+      boolean isAcceptedVlanNumber =
+          currentVlan.getVlanNumber() > defaultVlanNumber
+              && currentVlan.getVlanNumber() < serviceVlanNumber;
+
+      if (isAcceptedVlanNumber) {
+        multiLayerSwitchVlanManager.addVlan(currentVlan.getVlanNumber(), currentVlan.getName());
+
+        multiLayerSwitchVlanManager.addVlanInt(currentVlan.getVlanNumber());
+        RouterPort vlanInterface =
+            multiLayerSwitchVlanManager.getVlanInt(currentVlan.getVlanNumber());
+
+        IPAddress subnetMask = new IPAddressImpl(Constants.DEFAULT_SUBNET_MASK);
+        IPAddress subnetAddress =
+            new IPAddressImpl("192.168." + (currentVlan.getVlanNumber() - 1) + ".1");
+
+        vlanInterface.setIpSubnetMask(subnetAddress, subnetMask);
+      }
     }
   }
 }
