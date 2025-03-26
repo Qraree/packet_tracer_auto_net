@@ -55,6 +55,18 @@ public class NetworkNode {
     this.connections.add(newConnection);
   }
 
+  public void deleteConnection(NetworkNode otherNode) {
+    this.connections.removeIf(connection -> connection.connectedNode == otherNode);
+  }
+
+  public void deleteAllConnections() {
+    for (NetworkNodeConnection connection : connections) {
+      connection.connectedNode.deleteConnection(this);
+    }
+
+    this.connections.clear();
+  }
+
   public boolean checkForExistingConnection(NetworkNode node) {
 
     for (NetworkNodeConnection connection : connections) {
