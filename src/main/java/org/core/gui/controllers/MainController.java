@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 public class MainController implements Initializable {
   private final String devicePagePath = "/fxml/device_page.fxml";
   private final String configPagePath = "/fxml/configuration_page.fxml";
+  private final String addDevicePagePath = "/fxml/add_device_page.fxml";
 
   @FXML private StackPane stackPane;
 
@@ -26,6 +27,10 @@ public class MainController implements Initializable {
 
   public void devicePage() throws IOException {
     loadStackPage(devicePagePath);
+  }
+
+  public void addDevicePage() throws IOException {
+    loadStackPage(addDevicePagePath);
   }
 
   public void configurationPage() throws IOException {
