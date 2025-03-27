@@ -37,8 +37,15 @@ public class Constants {
 
   public static final String DEFAULT_SUBNET_MASK = "255.255.255.0";
 
-  public static final String VLAN_MANAGER_PROCESS = "VlanManager";
+  // VLAN_NUMBER
+  public static final Integer VLAN_DEFAULT_NUMBER = 1;
+  public static final Integer VLAN_SERVICE_NUMBER = 1002;
 
+  // PROCESS
+  public static final String VLAN_MANAGER_PROCESS = "VlanManager";
+  public static final String OSPF_MAIN_PROCESS = "OspfMainProcess";
+
+  // CLI COMMANDS
   public static final String TERMINAL_NO_RESPONSE = "no";
   public static final String TERMINAL_USER_MODE = "user";
   public static final String TERMINAL_ENABLE_MODE = "enable";
@@ -46,4 +53,6 @@ public class Constants {
   public static final String TERMINAL_CONFIG_RESPONSE = "configure terminal";
   public static final String TERMINAL_IP_ROUTING_COMMAND = "ip routing";
   public static final String TERMINAL_SWITCH_TO_TRUNK_COMMAND = "switchport mode trunk";
+  public static final String TERMINAL_NO_SWITCHPORT_COMMAND = "no switchport";
+  public static final String TERMINAL_ROUTER_OSPF_COMMAND = "router ospf 1";
 }

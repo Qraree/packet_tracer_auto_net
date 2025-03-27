@@ -62,13 +62,6 @@ public class AddDevicePageController implements Initializable {
     DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
   }
 
-  public void configureFinalNetwork() {
-    logger.log(Level.INFO, "Configuring final network");
-    ArrayList<Device> devices = DeviceService.getAllDevices();
-    NetworkConfigurationService.configureFinalNetwork(devices);
-    logger.log(Level.FINE, "Network configuration finished");
-  }
-
   public void configureFinalNetworkRandomV2() {
     logger.log(Level.INFO, "Configuring final network");
     ObservableList<NetworkNode> networkNodes = GlobalNetwork.getInstance().getNetworkNodes();

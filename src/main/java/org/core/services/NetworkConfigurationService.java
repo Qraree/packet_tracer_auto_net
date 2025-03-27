@@ -6,102 +6,20 @@ import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import javafx.collections.ObservableList;
+import org.core.config.CommandBuilder;
 import org.core.config.Constants;
+import org.core.config.UtilCommon;
 import org.core.models.NetworkNode;
 import org.core.models.NetworkNodeConnection;
 
 public class NetworkConfigurationService {
 
-  public static void configureFinalNetwork(ArrayList<Device> devices) {
-
-    ArrayList<Device> networkDevices =
-        devices.stream()
-            .filter(device -> device.getType() == DeviceType.SWITCH)
-            .collect(Collectors.toCollection(ArrayList::new));
+  // extract to class
+  public static void configFinalNetworkRandomV2(ObservableList<NetworkNode> networkNodes) {
 
     int subnetIndex = 2;
-    for (Device netDevice : networkDevices) {
-      System.out.println(netDevice.getName());
-      VLANManager vlanManager = (VLANManager) netDevice.getProcess("VlanManager");
-      vlanManager.addVlan(subnetIndex, "subnet_" + subnetIndex);
-
-      List<String> ports = netDevice.getPorts();
-
-      int pcIndex = 2;
-
-      for (String portName : ports) {
-        Port port = netDevice.getPort(portName);
-        Cable link = (Cable) port.getLink();
-
-        if (link != null) {
-
-          if (port instanceof SwitchPort switchPort) {
-            switchPort.setAccessVlan(subnetIndex);
-          }
-
-          Port otherPort;
-          Port netDevicePort;
-
-          if (port.getObjectUUID() == link.getPort1().getObjectUUID()) {
-            otherPort = link.getPort2();
-            netDevicePort = link.getPort1();
-          } else {
-            otherPort = link.getPort1();
-            netDevicePort = link.getPort2();
-          }
-
-          Device otherDevice = otherPort.getOwnerDevice();
-          Device netDevicce = netDevicePort.getOwnerDevice();
-          String PortName = netDevicce.getName();
-
-          System.out.println(netDevicce.getName());
-
-          boolean isPersonalDevice =
-              Arrays.asList(DeviceType.PC, DeviceType.LAPTOP).contains(otherDevice.getType());
-
-          if (isPersonalDevice) {
-            IPAddress defaultGatewayAddress =
-                new IPAddressImpl("192.168." + (subnetIndex - 1) + ".1");
-            IPAddress subnetMask = new IPAddressImpl("255.255.255.0");
-            IPAddress subnetAddress =
-                new IPAddressImpl("192.168." + (subnetIndex - 1) + "." + pcIndex);
-
-            HostPort hostPort = (HostPort) otherDevice.getPort("FastEthernet0");
-            hostPort.setIpSubnetMask(subnetAddress, subnetMask);
-            hostPort.setDefaultGateway(defaultGatewayAddress);
-            pcIndex++;
-          }
-
-          boolean isRouterDevice = otherDevice.getType() == DeviceType.ROUTER;
-
-          if (isRouterDevice
-              && otherDevice instanceof Router router
-              && otherPort instanceof RouterPort routerPort) {
-
-            System.out.println("Router " + router.getName() + " " + routerPort.getName());
-
-            if (port instanceof SwitchPort switchPort) {
-              switchPort.setAccessPort(false);
-            }
-
-            routerPort.setPower(true);
-            router.addSubInt(PortName, subnetIndex);
-            router.changePortEncapsulation(PortName, "dot1Q");
-
-            IPAddress subnetMask = new IPAddressImpl("255.255.255.0");
-            IPAddress subnetAddress = new IPAddressImpl("192.168." + (subnetIndex - 1) + ".1");
-            routerPort.setIpSubnetMask(subnetAddress, subnetMask);
-          }
-        }
-      }
-      subnetIndex++;
-    }
-  }
-
-  public static void configFinalNetworkRandomV2(ObservableList<NetworkNode> networkNodes) {
 
     ArrayList<NetworkNode> networkDevices =
         networkNodes.stream()
@@ -109,7 +27,6 @@ public class NetworkConfigurationService {
             .filter(node -> !node.getConnections().isEmpty())
             .collect(Collectors.toCollection(ArrayList::new));
 
-    int subnetIndex = 2;
     String privateSubnetPrefix = "192.168.";
     String subnetNamePrefix = "subnet_";
 
@@ -129,16 +46,16 @@ public class NetworkConfigurationService {
             Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
 
         if (isConnectedToEndDevice) {
-          if (nodeConnection.connectedPort instanceof SwitchPort switchPort) {
+          if (nodeConnection.getConnectedPort() instanceof SwitchPort switchPort) {
             switchPort.setAccessPort(true);
             switchPort.setAccessVlan(subnetIndex);
           }
 
           IPAddress defaultGatewayAddress =
-              new IPAddressImpl(privateSubnetPrefix + (subnetIndex - 1) + ".1");
+              new IPAddressImpl(privateSubnetPrefix + subnetIndex + ".1");
           IPAddress subnetMask = new IPAddressImpl(Constants.DEFAULT_SUBNET_MASK);
           IPAddress subnetAddress =
-              new IPAddressImpl(privateSubnetPrefix + (subnetIndex - 1) + "." + endDeviceIndex);
+              new IPAddressImpl(privateSubnetPrefix + subnetIndex + "." + endDeviceIndex);
 
           HostPort hostPort = (HostPort) nodeConnection.getOtherPort();
           hostPort.setIpSubnetMask(subnetAddress, subnetMask);
@@ -158,25 +75,148 @@ public class NetworkConfigurationService {
       subnetIndex++;
     }
 
-    // network Layer Configuration
+    NetworkLayerConfiguration(networkNodes, subnetIndex);
+  }
+
+  private static void NetworkLayerConfiguration(
+      ObservableList<NetworkNode> networkNodes, int subnetIndex) {
     ArrayList<NetworkNode> multilayerSwitches =
         networkNodes.stream()
             .filter(node -> Constants.MULTILAYER_SWITCH_TYPES.contains(node.getStringType()))
             .filter(node -> !node.getConnections().isEmpty())
             .collect(Collectors.toCollection(ArrayList::new));
 
-    for (NetworkNode switchNode : multilayerSwitches) {
-      setupConfigureTerminalMode(switchNode);
-      configureMultiLayerVlan(switchNode, switchNode);
+    ArrayList<NetworkNode> pastSwitches = new ArrayList<>();
 
-      ArrayList<NetworkNodeConnection> nodeConnections = switchNode.getConnections();
+    for (NetworkNode switchL3Node : multilayerSwitches) {
+      OSPFMainProcess ospfMainProcess = getOSPFMainProcess(switchL3Node);
+      ospfMainProcess.addOspfProcess(0);
+
+      setupConfigureTerminalMode(switchL3Node);
+      setL3SwitchAccessVlanPorts(switchL3Node);
+
+      ArrayList<NetworkNodeConnection> nodeConnections = switchL3Node.getConnections();
       for (NetworkNodeConnection nodeConnection : nodeConnections) {
         NetworkNode connectedNode = nodeConnection.getConnectedNode();
 
         boolean isConnectedToSwitch = connectedNode.getType() == DeviceType.SWITCH;
         if (isConnectedToSwitch) {
-          configureMultiLayerVlan(connectedNode, switchNode);
+          configureMultiLayerVlan(connectedNode, switchL3Node);
         }
+
+        boolean isConnectedToSwitchL3 =
+            Arrays.asList(DeviceType.MULTI_LAYER_SWITCH, DeviceType.SWITCH3650)
+                .contains(connectedNode.getType());
+
+        if (isConnectedToSwitchL3) {
+
+          TerminalLine terminalLine = switchL3Node.getDevice().getCommandLine();
+
+          terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
+          String ospfNetworkCommand = CommandBuilder.buildOspfSubnetCommand(subnetIndex, 0, null);
+          terminalLine.enterCommand(ospfNetworkCommand);
+
+          if (pastSwitches.contains(connectedNode)) continue;
+
+          // port.getIpAddress IPC error <IPC call "getIpAddress" not found> bruh.
+          // so will get it through terminal
+          terminalLine.enterCommand("interface " + nodeConnection.getConnectedPort().getName());
+          terminalLine.enterCommand(Constants.TERMINAL_NO_SWITCHPORT_COMMAND);
+          String switchIpCommand =
+              CommandBuilder.buildIpAddressDefaultSubnetCommand(subnetIndex, 1, null);
+          terminalLine.enterCommand(switchIpCommand);
+
+          TerminalLine otherTerminalLine = connectedNode.getDevice().getCommandLine();
+          otherTerminalLine.enterCommand("interface " + nodeConnection.getOtherPort().getName());
+          otherTerminalLine.enterCommand(Constants.TERMINAL_NO_SWITCHPORT_COMMAND);
+          String otherIpCommand =
+              CommandBuilder.buildIpAddressDefaultSubnetCommand(subnetIndex, 254, null);
+          otherTerminalLine.enterCommand(otherIpCommand);
+
+          subnetIndex++;
+        }
+        pastSwitches.add(switchL3Node);
+      }
+
+      setOSPFOnSwitchL3Ports(switchL3Node);
+    }
+  }
+
+  private static void setL3SwitchAccessVlanPorts(NetworkNode switchL3Node) {
+    VLANManager vlanManager = getVlanManager(switchL3Node);
+    int vlanCount = vlanManager.getVlanCount();
+
+    for (int index = 0; index < vlanCount; index++) {
+      VLAN vlan = vlanManager.getVlanAt(index);
+      if (UtilCommon.isValidVlanNumber(vlan)) {
+        configureVlanOnSwitch(vlanManager, vlan);
+        configureAccessPorts(switchL3Node, vlan);
+      }
+    }
+  }
+
+  private static void configureMultiLayerVlan(NetworkNode nodeForVlan, NetworkNode multiLayerNode) {
+    VLANManager sourceVlanManager = getVlanManager(nodeForVlan);
+    VLANManager targetVlanManager = getVlanManager(multiLayerNode);
+    int vlanCount = sourceVlanManager.getVlanCount();
+
+    for (int index = 0; index < vlanCount; index++) {
+      VLAN vlan = sourceVlanManager.getVlanAt(index);
+      if (UtilCommon.isValidVlanNumber(vlan)) {
+        configureVlanOnSwitch(targetVlanManager, vlan);
+      }
+    }
+  }
+
+  private static void setOSPFOnSwitchL3Ports(NetworkNode switchL3Node) {
+    OSPFMainProcess ospfMainProcess = getOSPFMainProcess(switchL3Node);
+    VLANManager vlanManager = getVlanManager(switchL3Node);
+    int vlanCount = vlanManager.getVlanCount();
+    ospfMainProcess.addOspfProcess(0);
+    OSPFProcess ospfProcess = (OSPFProcess) ospfMainProcess.getOspfProcessAt(0);
+
+    for (int index = 0; index < vlanCount; index++) {
+      VLAN vlan = vlanManager.getVlanAt(index);
+      if (UtilCommon.isValidVlanNumber(vlan)) {
+
+        TerminalLine terminalLine = switchL3Node.getDevice().getCommandLine();
+        terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
+        String ospfNetworkCommand =
+            CommandBuilder.buildOspfSubnetCommand(vlan.getVlanNumber(), 0, null);
+        terminalLine.enterCommand(ospfNetworkCommand);
+      }
+    }
+  }
+
+  private static OSPFMainProcess getOSPFMainProcess(NetworkNode node) {
+    return (OSPFMainProcess) node.getDevice().getProcess(Constants.OSPF_MAIN_PROCESS);
+  }
+
+  private static VLANManager getVlanManager(NetworkNode node) {
+    return (VLANManager) node.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
+  }
+
+  private static void configureVlanOnSwitch(VLANManager vlanManager, VLAN vlan) {
+    vlanManager.addVlan(vlan.getVlanNumber(), vlan.getName());
+    vlanManager.addVlanInt(vlan.getVlanNumber());
+    setVlanInterfaceIp(vlanManager, vlan);
+  }
+
+  private static void setVlanInterfaceIp(VLANManager vlanManager, VLAN vlan) {
+    RouterPort vlanInterface = vlanManager.getVlanInt(vlan.getVlanNumber());
+    IPAddress subnetMask = new IPAddressImpl(Constants.DEFAULT_SUBNET_MASK);
+    IPAddress subnetAddress = new IPAddressImpl("192.168." + vlan.getVlanNumber() + ".1");
+    vlanInterface.setIpSubnetMask(subnetAddress, subnetMask);
+  }
+
+  private static void configureAccessPorts(NetworkNode switchNode, VLAN vlan) {
+    TerminalLine terminalLine = switchNode.getDevice().getCommandLine();
+    for (NetworkNodeConnection connection : switchNode.getConnections()) {
+      NetworkNode connectedNode = connection.getConnectedNode();
+      if (Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType())) {
+        Port connectedPort = connection.getConnectedPort();
+        terminalLine.enterCommand("interface " + connectedPort.getName());
+        terminalLine.enterCommand("switchport access vlan " + vlan.getVlanNumber());
       }
     }
   }
@@ -204,54 +244,5 @@ public class NetworkConfigurationService {
     }
 
     terminalLine.enterCommand(Constants.TERMINAL_IP_ROUTING_COMMAND);
-  }
-
-  private static void configureMultiLayerVlan(NetworkNode nodeForVlan, NetworkNode multiLayerNode) {
-    int defaultVlanNumber = 1;
-    int serviceVlanNumber = 1002;
-
-    VLANManager connectedNodeVlanManager =
-        (VLANManager) nodeForVlan.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
-
-    VLANManager multiLayerSwitchVlanManager =
-        (VLANManager) multiLayerNode.getDevice().getProcess(Constants.VLAN_MANAGER_PROCESS);
-
-    int vlanCount = connectedNodeVlanManager.getVlanCount();
-    for (int index = 0; index < vlanCount; index++) {
-      VLAN currentVlan = connectedNodeVlanManager.getVlanAt(index);
-
-      boolean isAcceptedVlanNumber =
-          currentVlan.getVlanNumber() > defaultVlanNumber
-              && currentVlan.getVlanNumber() < serviceVlanNumber;
-
-      if (isAcceptedVlanNumber) {
-        multiLayerSwitchVlanManager.addVlan(currentVlan.getVlanNumber(), currentVlan.getName());
-
-        multiLayerSwitchVlanManager.addVlanInt(currentVlan.getVlanNumber());
-        RouterPort vlanInterface =
-            multiLayerSwitchVlanManager.getVlanInt(currentVlan.getVlanNumber());
-
-        IPAddress subnetMask = new IPAddressImpl(Constants.DEFAULT_SUBNET_MASK);
-        IPAddress subnetAddress =
-            new IPAddressImpl("192.168." + (currentVlan.getVlanNumber() - 1) + ".1");
-
-        vlanInterface.setIpSubnetMask(subnetAddress, subnetMask);
-
-        if (nodeForVlan.getName().equals(multiLayerNode.getName())) {
-          TerminalLine terminalLine = multiLayerNode.getDevice().getCommandLine();
-          for (NetworkNodeConnection nodeConnection : multiLayerNode.getConnections()) {
-            NetworkNode connectedNode = nodeConnection.getConnectedNode();
-
-            boolean isEndDevice =
-                Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
-            if (isEndDevice) {
-              Port connectedPort = nodeConnection.getConnectedPort();
-              terminalLine.enterCommand("interface " + connectedPort.getName());
-              terminalLine.enterCommand("switchport access vlan " + currentVlan.getVlanNumber());
-            }
-          }
-        }
-      }
-    }
   }
 }
