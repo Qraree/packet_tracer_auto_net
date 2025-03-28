@@ -12,11 +12,11 @@ import com.cisco.pt.ptmp.PacketTracerSession;
 import com.cisco.pt.ptmp.PacketTracerSessionFactory;
 import com.cisco.pt.ptmp.impl.PacketTracerSessionFactoryImpl;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.core.config.ConfigLoader;
 import org.core.events.EventManager;
 import org.core.gui.GUIManager;
 import org.core.services.DeviceService;
@@ -61,12 +61,13 @@ public class PacketTracerConnector extends Application {
     PacketTracerSessionFactory sessionFactory = PacketTracerSessionFactoryImpl.getInstance();
     ConnectionNegotiationProperties cnp = OptionsManager.getInstance().getConnectOpts();
 
-    Map<String, String> env = System.getenv();
+    cnp.setAuthenticationSecret(ConfigLoader.get(ENV_SECRET));
+    cnp.setAuthenticationApplication(ConfigLoader.get(ENV_AUTH_APP));
 
-    cnp.setAuthenticationSecret(env.get(ENV_SECRET));
-    cnp.setAuthenticationApplication(env.get(ENV_AUTH_APP));
+    String url = ConfigLoader.get(ENV_URL);
+    int port = Integer.parseInt(ConfigLoader.get(ENV_PORT));
 
-    return sessionFactory.openSession(env.get(ENV_URL), Integer.parseInt(env.get(ENV_PORT)), cnp);
+    return sessionFactory.openSession(url, port, cnp);
   }
 
   private static IPC setupIPC(PacketTracerSession session) {

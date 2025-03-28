@@ -74,12 +74,24 @@ public class DeviceService {
     }
   }
 
-  public static void deleteAllDevices() throws InterruptedException {
+  public static void deleteAllDevices() {
     ObservableList<NetworkNode> nodes = GlobalNetwork.getInstance().getNetworkNodes();
 
     for (NetworkNode node : nodes) {
       logicalWorkspace.removeDevice(node.getName());
     }
+  }
+
+  public static void addSubnet(Integer deviceCount) {
+    ArrayList<Device> devices = addDeviceGroup(deviceCount, 300, 300, 60);
+    Device networkDevice =
+        addDevice(
+            DeviceModelEnum.SWITCH_2950_24.getDeviceType(),
+            DeviceModelEnum.SWITCH_2950_24.getModel(),
+            200,
+            200);
+
+    DeviceService.linkNetworkDeviceToEndDevices(networkDevice, devices);
   }
 
   public static void addRandomNetwork(Integer netDeviceCount, Integer endDeviceCount) {
