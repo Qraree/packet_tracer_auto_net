@@ -31,6 +31,11 @@
                     <mainClass>org.core.PacketTracerConnector</mainClass>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.1</version>
+            </plugin>
             <!--            <plugin>-->
             <!--                <groupId>io.github.fvarrui</groupId>-->
             <!--                <artifactId>javapackager</artifactId>-->
