@@ -22,6 +22,12 @@ Before running the service, ensure you have:
 ---
 
 ### 2. **Build the project**
+   Install framework for ipc connection
+   ```bash
+   mvn install:install-file -Dfile=libs/pt-cep-java-framework-8.1.0.0.jar -DgroupId=com.cisco.pt -DartifactId=pt-cep-java-framework -Dversion=8.1.0.0 -Dpackaging=jar
+   ```
+
+   Then install the project
    ```bash
     mvn clean install
    ```
