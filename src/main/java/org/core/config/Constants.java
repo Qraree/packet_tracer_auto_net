@@ -36,6 +36,7 @@ public class Constants {
       new ArrayList<>(Arrays.asList(DeviceType.PC.toString(), DeviceType.LAPTOP.toString()));
 
   public static final String DEFAULT_SUBNET_MASK = "255.255.255.0";
+  public static final String DEFAULT_PC_INTERFACE = "FastEthernet0";
 
   // VLAN_NUMBER
   public static final Integer VLAN_DEFAULT_NUMBER = 1;

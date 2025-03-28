@@ -5,18 +5,13 @@ import com.cisco.pt.ipc.sim.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import org.core.config.DeviceModelEnum;
 import org.core.gui.GUIValidator;
-import org.core.models.GlobalNetwork;
-import org.core.models.NetworkNode;
 import org.core.services.DeviceService;
-import org.core.services.NetworkConfigurationService;
 
 public class AddDevicePageController implements Initializable {
   private static final Logger logger = Logger.getLogger(AddDevicePageController.class.getName());
@@ -24,6 +19,8 @@ public class AddDevicePageController implements Initializable {
   public TextField randomCount;
   public TextField subnetDeviceCount;
   public ChoiceBox<String> subnetNetworkDeviceChoice;
+  public TextField addRandomNetworkNetDeviceCount;
+  public TextField addRandomNetworkEndDeviceCount;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,14 +55,21 @@ public class AddDevicePageController implements Initializable {
     if (GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
     int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
 
-    DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
-    DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+    ArrayList<Device> devices = DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
+    Device networkDevice =
+        DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
+    DeviceService.linkNetworkDeviceToEndDevices(networkDevice, devices);
   }
 
-  public void configureFinalNetworkRandomV2() {
-    logger.log(Level.INFO, "Configuring final network");
-    ObservableList<NetworkNode> networkNodes = GlobalNetwork.getInstance().getNetworkNodes();
-    NetworkConfigurationService.configFinalNetworkRandomV2(networkNodes);
-    logger.log(Level.FINE, "Network configuration finished");
+  public void AddRandomNetwork() throws InterruptedException {
+    if (GUIValidator.validateNumberInput(addRandomNetworkNetDeviceCount.getText(), 0, 30)) return;
+    if (GUIValidator.validateNumberInput(addRandomNetworkEndDeviceCount.getText(), 0, 30)) return;
+
+    DeviceService.deleteAllDevices();
+
+    int netDeviceCount = Integer.parseInt(addRandomNetworkNetDeviceCount.getText());
+    int endDeviceCount = Integer.parseInt(addRandomNetworkEndDeviceCount.getText());
+
+    DeviceService.addRandomNetwork(netDeviceCount, endDeviceCount);
   }
 }

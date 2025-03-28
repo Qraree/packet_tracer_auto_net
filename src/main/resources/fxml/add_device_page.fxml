@@ -8,7 +8,7 @@
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.core.gui.controllers.AddDevicePageController">
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="667.0" prefWidth="898.0" vbarPolicy="ALWAYS">
         <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="660.0" prefWidth="882.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="721.0" prefWidth="882.0">
                 <children>
                     <Button layoutX="18.0" layoutY="69.0" onAction="#handleAddRandomDeviceAction"
                             style="-fx-background-color: #798ed4;             -fx-border-color: #a1afb3;"
@@ -18,16 +18,16 @@
                             style="-fx-background-color: #798ed4; -fx-border-color: #a1afb3;" text="Group of PC's"
                             textFill="WHITE"/>
                     <Label layoutX="14.0" layoutY="121.0" text="Device count in network - "/>
-                    <TextField fx:id="randomCount" layoutX="193.0" layoutY="115.0" prefHeight="28.0" prefWidth="75.0"/>
+                    <TextField fx:id="randomCount" layoutX="158.0" layoutY="116.0" prefHeight="28.0" prefWidth="75.0"/>
                     <Button layoutX="21.0" layoutY="364.0" mnemonicParsing="false" onAction="#handleAddSubnetAction"
                             style="-fx-background-color: #798ed4;" text="Add" textFill="WHITE"/>
-                    <Separator layoutY="188.0" prefHeight="7.0" prefWidth="711.0"/>
+                    <Separator layoutY="188.0" prefHeight="3.0" prefWidth="898.0"/>
                     <Label layoutX="14.0" layoutY="209.0" text="Add subnet">
                         <font>
                             <Font name="Arial Bold" size="14.0"/>
                         </font>
                     </Label>
-                    <Label layoutX="21.0" layoutY="245.0" text="IPv4 address - "/>
+                    <Label layoutX="20.0" layoutY="245.0" text="IPv4 address - "/>
 
                     <TextField layoutX="105.0" layoutY="242.0" prefHeight="26.0" prefWidth="40.0"/>
                     <Label layoutX="150.0" layoutY="254.0" text="."/>
@@ -44,16 +44,32 @@
                     <TextField layoutX="310.0" layoutY="242.0" prefHeight="26.0" prefWidth="40.0"/>
 
 
-                    <Label layoutX="21.0" layoutY="277.0" text="Network device - "/>
-                    <ChoiceBox fx:id="subnetNetworkDeviceChoice" layoutX="118.0" layoutY="273.0" prefWidth="150.0"/>
-                    <Label layoutX="18.0" layoutY="323.0" text="End device count - "/>
-                    <TextField fx:id="subnetDeviceCount" layoutX="122.0" layoutY="319.0" prefHeight="26.0"
+                    <Label layoutX="20.0" layoutY="287.0" text="Network device - "/>
+                    <ChoiceBox fx:id="subnetNetworkDeviceChoice" layoutX="120.0" layoutY="282.0" prefWidth="150.0"/>
+                    <Label layoutX="21.0" layoutY="324.0" text="End device count - "/>
+                    <TextField fx:id="subnetDeviceCount" layoutX="127.0" layoutY="320.0" prefHeight="26.0"
                                prefWidth="63.0"/>
                     <Label layoutX="18.0" layoutY="34.0" text="Add random device">
                         <font>
                             <Font name="Arial Bold" size="14.0"/>
                         </font>
                     </Label>
+                    <Separator layoutX="5.0" layoutY="418.0" prefHeight="0.0" prefWidth="888.0"/>
+                    <Label layoutX="14.0" layoutY="436.0" text="Add random network">
+                        <font>
+                            <Font name="Arial Bold" size="14.0"/>
+                        </font>
+                    </Label>
+                    <Button layoutX="14.0" layoutY="525.0" onAction="#AddRandomNetwork" mnemonicParsing="false"
+                            style="-fx-background-color: #798ed4;" text="Create" textFill="WHITE"/>
+                    <Label layoutX="20.0" layoutY="465.0" text="Network device count - "
+                    />
+                    <Label layoutX="20.0" layoutY="498.0" text="End device count - "
+                    />
+                    <TextField layoutX="157.0" layoutY="461.0" prefHeight="26.0" prefWidth="77.0"
+                               fx:id="addRandomNetworkNetDeviceCount"/>
+                    <TextField layoutX="131.0" layoutY="494.0" prefHeight="26.0" prefWidth="64.0"
+                               fx:id="addRandomNetworkEndDeviceCount"/>
 
                 </children>
             </AnchorPane>
