@@ -113,7 +113,10 @@ public class NetworkConfigurationService {
           TerminalLine terminalLine = switchL3Node.getDevice().getCommandLine();
 
           terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
-          String ospfNetworkCommand = CommandBuilder.buildOspfSubnetCommand(subnetIndex, 0, null);
+
+          // tochno - 1?
+          String ospfNetworkCommand =
+              CommandBuilder.buildOspfSubnetCommand(subnetIndex - 1, 0, null);
           terminalLine.enterCommand(ospfNetworkCommand);
 
           if (pastSwitches.contains(connectedNode)) continue;
@@ -169,18 +172,15 @@ public class NetworkConfigurationService {
   }
 
   private static void setOSPFOnSwitchL3Ports(NetworkNode switchL3Node) {
-    OSPFMainProcess ospfMainProcess = getOSPFMainProcess(switchL3Node);
     VLANManager vlanManager = getVlanManager(switchL3Node);
     int vlanCount = vlanManager.getVlanCount();
-    ospfMainProcess.addOspfProcess(0);
-    OSPFProcess ospfProcess = (OSPFProcess) ospfMainProcess.getOspfProcessAt(0);
 
+    TerminalLine terminalLine = switchL3Node.getDevice().getCommandLine();
+    terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
     for (int index = 0; index < vlanCount; index++) {
       VLAN vlan = vlanManager.getVlanAt(index);
       if (UtilCommon.isValidVlanNumber(vlan)) {
 
-        TerminalLine terminalLine = switchL3Node.getDevice().getCommandLine();
-        terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
         String ospfNetworkCommand =
             CommandBuilder.buildOspfSubnetCommand(vlan.getVlanNumber(), 0, null);
         terminalLine.enterCommand(ospfNetworkCommand);

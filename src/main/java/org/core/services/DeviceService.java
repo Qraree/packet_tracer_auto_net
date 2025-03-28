@@ -142,7 +142,7 @@ public class DeviceService {
     }
   }
 
-  public static void addRandomDevice(Integer xBoundary, Integer yBoundary) {
+  public static Device addRandomDevice(Integer xBoundary, Integer yBoundary) {
     if (logicalWorkspace == null) {
       throw new RuntimeException("No logical workspace available");
     }
@@ -162,11 +162,14 @@ public class DeviceService {
     double randomXCoordinate = roundedValue.apply(random.nextDouble() * xBoundary);
     double randomYCoordinate = roundedValue.apply(random.nextDouble() * yBoundary);
 
-    logicalWorkspace.addDevice(
-        (DeviceType) DevicesArray[randomDeviceIndex][0],
-        (String) DevicesArray[randomDeviceIndex][1],
-        randomXCoordinate,
-        randomYCoordinate);
+    String deviceName =
+        logicalWorkspace.addDevice(
+            (DeviceType) DevicesArray[randomDeviceIndex][0],
+            (String) DevicesArray[randomDeviceIndex][1],
+            randomXCoordinate,
+            randomYCoordinate);
+
+    return getDeviceByName(deviceName);
   }
 
   public static ArrayList<Device> addDeviceGroup(
