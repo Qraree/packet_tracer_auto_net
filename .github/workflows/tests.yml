@@ -31,8 +31,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Install local cep dependency
+        run: mvn install:install-file -Dfile=libs/pt-cep-java-framework-8.1.0.0.jar -DgroupId=com.cisco.pt -DartifactId=pt-cep-java-framework -Dversion=8.1.0.0 -Dpackaging=jar
+
       - name: Build with Maven
         run: mvn clean install -DskipTests=false
 
       - name: Run tests with Maven
-        run: mvn test 
+        run: mvn test
