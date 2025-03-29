@@ -4,10 +4,12 @@ import com.cisco.pt.IPAddress;
 import com.cisco.pt.impl.IPAddressImpl;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.*;
+import com.cisco.pt.ipcutil.PingUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javafx.collections.ObservableList;
+import org.core.PacketTracerConnector;
 import org.core.config.CommandBuilder;
 import org.core.config.Constants;
 import org.core.config.UtilCommon;
@@ -78,6 +80,9 @@ public class NetworkConfigurationService {
     }
 
     NetworkLayerConfiguration(networkNodes, subnetIndex);
+
+    PingUtil pingUtil = new PingUtil(PacketTracerConnector.ipcInstance.getFactory(), PacketTracerConnector.ipcInstance.getPacketTracerSession().getEventManager());
+    pingUtil.sendPing("PC0", new IPAddressImpl("192.168.2.3"), 10, 10);
   }
 
   private static void NetworkLayerConfiguration(
