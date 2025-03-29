@@ -3,7 +3,8 @@ package org.core.events.listeners;
 import com.cisco.pt.ipc.events.AppWindowEvent;
 import org.core.events.EventListener;
 
-public class AppWindowEventListener implements EventListener<AppWindowEvent> {
+public class AppWindowEventListener
+    implements EventListener<AppWindowEvent>, com.cisco.pt.ipc.events.AppWindowEventListener {
 
   @Override
   public void handleEvent(AppWindowEvent event) {

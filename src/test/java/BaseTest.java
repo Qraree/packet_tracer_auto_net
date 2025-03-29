@@ -2,6 +2,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import org.core.PacketTracerConnector;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 public class BaseTest {
@@ -14,5 +15,10 @@ public class BaseTest {
     } catch (IOException e) {
       fail("Could not connect packet tracer");
     }
+  }
+
+  @AfterAll
+  static void tearDownConnectionToPacketTracer() {
+    PacketTracerConnector.shutdown();
   }
 }

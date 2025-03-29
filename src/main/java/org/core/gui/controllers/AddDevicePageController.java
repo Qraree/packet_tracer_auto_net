@@ -72,4 +72,8 @@ public class AddDevicePageController implements Initializable {
 
     DeviceService.addRandomNetwork(netDeviceCount, endDeviceCount);
   }
+
+  public void deleteAllDevices() {
+    DeviceService.deleteAllDevices();
+  }
 }

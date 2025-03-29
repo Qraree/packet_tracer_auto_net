@@ -39,6 +39,7 @@ public class NetworkConfigurationService {
       ArrayList<NetworkNodeConnection> nodeConnections = networkDeviceNode.getConnections();
 
       int endDeviceIndex = 2;
+      boolean endDeviceFound = false;
 
       for (NetworkNodeConnection nodeConnection : nodeConnections) {
         NetworkNode connectedNode = nodeConnection.getConnectedNode();
@@ -46,6 +47,7 @@ public class NetworkConfigurationService {
             Constants.END_DEVICE_TYPES.contains(connectedNode.getStringType());
 
         if (isConnectedToEndDevice) {
+          endDeviceFound = true;
           if (nodeConnection.getConnectedPort() instanceof SwitchPort switchPort) {
             switchPort.setAccessPort(true);
             switchPort.setAccessVlan(subnetIndex);
@@ -72,7 +74,7 @@ public class NetworkConfigurationService {
           terminalLine.enterCommand(Constants.TERMINAL_SWITCH_TO_TRUNK_COMMAND);
         }
       }
-      subnetIndex++;
+      if (endDeviceFound) subnetIndex++;
     }
 
     NetworkLayerConfiguration(networkNodes, subnetIndex);
@@ -89,8 +91,6 @@ public class NetworkConfigurationService {
     ArrayList<NetworkNode> pastSwitches = new ArrayList<>();
 
     for (NetworkNode switchL3Node : multilayerSwitches) {
-      OSPFMainProcess ospfMainProcess = getOSPFMainProcess(switchL3Node);
-      ospfMainProcess.addOspfProcess(0);
 
       setupConfigureTerminalMode(switchL3Node);
       setL3SwitchAccessVlanPorts(switchL3Node);
@@ -109,17 +109,9 @@ public class NetworkConfigurationService {
                 .contains(connectedNode.getType());
 
         if (isConnectedToSwitchL3) {
+          if (pastSwitches.contains(connectedNode)) continue;
 
           TerminalLine terminalLine = switchL3Node.getDevice().getCommandLine();
-
-          terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
-
-          // tochno - 1?
-          String ospfNetworkCommand =
-              CommandBuilder.buildOspfSubnetCommand(subnetIndex - 1, 0, null);
-          terminalLine.enterCommand(ospfNetworkCommand);
-
-          if (pastSwitches.contains(connectedNode)) continue;
 
           // port.getIpAddress IPC error <IPC call "getIpAddress" not found> bruh.
           // so will get it through terminal
@@ -129,18 +121,26 @@ public class NetworkConfigurationService {
               CommandBuilder.buildIpAddressDefaultSubnetCommand(subnetIndex, 1, null);
           terminalLine.enterCommand(switchIpCommand);
 
+          terminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
+          String ospfNetworkCommand = CommandBuilder.buildOspfSubnetCommand(subnetIndex, 0, null);
+          terminalLine.enterCommand(ospfNetworkCommand);
+
           TerminalLine otherTerminalLine = connectedNode.getDevice().getCommandLine();
+
           otherTerminalLine.enterCommand("interface " + nodeConnection.getOtherPort().getName());
           otherTerminalLine.enterCommand(Constants.TERMINAL_NO_SWITCHPORT_COMMAND);
           String otherIpCommand =
               CommandBuilder.buildIpAddressDefaultSubnetCommand(subnetIndex, 254, null);
           otherTerminalLine.enterCommand(otherIpCommand);
 
+          otherTerminalLine.enterCommand(Constants.TERMINAL_ROUTER_OSPF_COMMAND);
+          otherTerminalLine.enterCommand(ospfNetworkCommand);
+
           subnetIndex++;
         }
-        pastSwitches.add(switchL3Node);
       }
 
+      pastSwitches.add(switchL3Node);
       setOSPFOnSwitchL3Ports(switchL3Node);
     }
   }

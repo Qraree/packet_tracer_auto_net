@@ -30,6 +30,7 @@ public class PacketTracerConnector extends Application {
   private static final String ENV_PORT = "PORT";
 
   public static IPC ipcInstance;
+  public static EventManager eventManagerInstance;
 
   @Override
   public void start(Stage primaryStage) throws Exception {
@@ -39,6 +40,8 @@ public class PacketTracerConnector extends Application {
 
   public static void main(String[] args) {
     try {
+      Runtime.getRuntime().addShutdownHook(new Thread(PacketTracerConnector::shutdown));
+
       launch();
     } catch (Exception e) {
       logger.log(Level.SEVERE, "An error occurred: ", e);
@@ -86,6 +89,7 @@ public class PacketTracerConnector extends Application {
 
   private static void registerListeners(PacketTracerSession session) throws IOException {
     EventManager eventManager = new EventManager(session);
+    eventManagerInstance = eventManager;
     eventManager.registerListeners(ipcInstance);
     logger.info("Connection to Packet Tracer Successful!");
   }
@@ -97,5 +101,15 @@ public class PacketTracerConnector extends Application {
 
   public static boolean isPacketSessionRunning() {
     return ipcInstance != null;
+  }
+
+  public static void shutdown() {
+    try {
+      eventManagerInstance.unregisterListeners();
+      ipcInstance = null;
+      logger.info("Packet Tracer session closed successfully.");
+    } catch (Exception e) {
+      logger.log(Level.SEVERE, "Error while closing Packet Tracer session: ", e);
+    }
   }
 }
