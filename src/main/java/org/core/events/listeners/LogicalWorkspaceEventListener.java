@@ -1,8 +1,13 @@
 package org.core.events.listeners;
 
+import com.cisco.pt.ipc.events.IPCEventManager;
 import com.cisco.pt.ipc.events.LogicalWorkspaceEvent;
+import com.cisco.pt.ipc.events.LogicalWorkspaceEventRegistry;
 import com.cisco.pt.ipc.sim.Device;
+import com.cisco.pt.ipc.ui.IPC;
+import java.io.IOException;
 import javafx.application.Platform;
+import org.core.config.Constants;
 import org.core.events.EventListener;
 import org.core.models.GlobalNetwork;
 import org.core.services.DeviceService;
@@ -13,7 +18,18 @@ public class LogicalWorkspaceEventListener
 
   public LogicalWorkspaceEventListener() {}
 
-  @Override
+  public void register(IPCEventManager ipcEventManager, IPC ipc) throws IOException {
+    LogicalWorkspaceEventRegistry LWRegistry = ipcEventManager.getLogicalWorkspaceEvents();
+
+    LWRegistry.addSpecificListenerFiltered(
+        this, ipc.appWindow().getActiveWorkspace().getLogicalWorkspace(), Constants.LWCallbackList);
+  }
+
+  public void unregister(IPCEventManager ipcEventManager) throws IOException {
+    LogicalWorkspaceEventRegistry AWRegistry = ipcEventManager.getLogicalWorkspaceEvents();
+    AWRegistry.removeListener(this);
+  }
+
   public void handleEvent(LogicalWorkspaceEvent event) {
     GlobalNetwork globalNetwork = GlobalNetwork.getInstance();
     System.out.println(event.type);
