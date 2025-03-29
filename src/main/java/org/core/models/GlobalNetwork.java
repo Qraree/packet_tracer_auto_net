@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.core.config.DeviceModelEnum;
 import org.core.gui.mappers.DeviceMapper;
 
 public class GlobalNetwork {
@@ -98,6 +99,9 @@ public class GlobalNetwork {
   }
 
   public void createNetworkNode(Device device) {
+    if (device.getModel().equals(DeviceModelEnum.PDD.getModel())) return;
+    System.out.println("Creating network node" + device.getName());
+
     networkNodes.add(DeviceMapper.mapOneToNetworkNode(device));
   }
 

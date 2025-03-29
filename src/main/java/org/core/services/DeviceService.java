@@ -3,6 +3,7 @@ package org.core.services;
 import com.cisco.pt.ipc.enums.ConnectType;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.Device;
+import com.cisco.pt.ipc.sim.Network;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,25 +11,23 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.collections.ObservableList;
 import org.core.PacketTracerConnector;
 import org.core.config.Constants;
 import org.core.config.DeviceModelEnum;
 import org.core.models.GlobalNetwork;
-import org.core.models.NetworkNode;
 
 public class DeviceService {
   private static final Logger logger = Logger.getLogger(DeviceService.class.getName());
 
   public static LogicalWorkspace logicalWorkspace =
       PacketTracerConnector.ipcInstance.appWindow().getActiveWorkspace().getLogicalWorkspace();
-  public static com.cisco.pt.ipc.sim.Network network = PacketTracerConnector.ipcInstance.network();
+  public static Network network = PacketTracerConnector.ipcInstance.network();
 
   public static void setupNetworkNodes() {
     int deviceCount = network.getDeviceCount();
     ArrayList<Device> devices = new ArrayList<>();
 
-    for (int i = 1; i < deviceCount; i++) {
+    for (int i = 0; i < deviceCount; i++) {
       Device device = network.getDeviceAt(i);
       devices.add(device);
     }
@@ -42,7 +41,7 @@ public class DeviceService {
     ArrayList<Device> allDevices = new ArrayList<>();
     int deviceCount = network.getDeviceCount();
 
-    for (int i = 1; i < deviceCount; i++) {
+    for (int i = 0; i < deviceCount; i++) {
       Device device = network.getDeviceAt(i);
       allDevices.add(device);
     }
@@ -75,11 +74,14 @@ public class DeviceService {
   }
 
   public static void deleteAllDevices() {
-    ObservableList<NetworkNode> nodes = GlobalNetwork.getInstance().getNetworkNodes();
+    List<String> deviceNames = getAllDevices().stream().map(Device::getName).toList();
 
-    for (NetworkNode node : nodes) {
-      logicalWorkspace.removeDevice(node.getName());
+    for (String name : deviceNames) {
+      logicalWorkspace.removeDevice(name);
     }
+
+    ArrayList<Device> devices = DeviceService.getAllDevices();
+    System.out.println("Devices size after delete " + devices.size());
   }
 
   public static void addSubnet(Integer deviceCount) {
@@ -209,6 +211,9 @@ public class DeviceService {
           devices.add(createdDevice);
 
           deviceCount++;
+          System.out.println("device count " + deviceCount);
+          int deviceSize = DeviceService.getAllDevices().size();
+          System.out.println("device size " + deviceSize);
         }
       }
     }

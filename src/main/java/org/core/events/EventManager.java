@@ -14,12 +14,16 @@ import org.core.events.listeners.LogicalWorkspaceEventListener;
 
 public class EventManager {
 
+  // todo refactor listeners
   IPCEventManager ipcEventManager;
   PacketTracerSession session;
 
   LogicalWorkspaceEventRegistry LWRegistry;
   AppWindowEventRegistry AWRegistry;
   WorkspaceEventRegistry WorkspaceRegistry;
+
+  LogicalWorkspaceEventListener LogicalWorkspaceEventListener;
+  AppWindowEventListener appWindowEventListener;
 
   public EventManager(PacketTracerSession session) throws IOException {
     this.session = session;
@@ -39,19 +43,25 @@ public class EventManager {
     registerAppWindowListener(appWindow);
   }
 
+  public void unregisterListeners() throws IOException {
+    LWRegistry.removeListener(LogicalWorkspaceEventListener);
+    AWRegistry.removeListener(appWindowEventListener);
+  }
+
   public void registerLogicalWorkspaceListener(LogicalWorkspace logicalWorkspace)
       throws IOException {
     List<String> LWCallbackList = Constants.LWCallbackList;
 
-    LogicalWorkspaceEventListener LWListener = new LogicalWorkspaceEventListener();
+    LogicalWorkspaceEventListener = new LogicalWorkspaceEventListener();
     LWRegistry.addSpecificListenerFiltered(
-        LWListener::handleEvent, logicalWorkspace, LWCallbackList);
+        LogicalWorkspaceEventListener::handleEvent, logicalWorkspace, LWCallbackList);
   }
 
   public void registerAppWindowListener(AppWindow appWindow) throws IOException {
     List<String> AWCallbackList = Constants.AWCallbackList;
 
-    AppWindowEventListener AWListener = new AppWindowEventListener();
-    AWRegistry.addSpecificListenerFiltered(AWListener::handleEvent, appWindow, AWCallbackList);
+    appWindowEventListener = new AppWindowEventListener();
+    AWRegistry.addSpecificListenerFiltered(
+        appWindowEventListener::handleEvent, appWindow, AWCallbackList);
   }
 }

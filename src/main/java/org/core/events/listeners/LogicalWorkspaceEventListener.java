@@ -7,7 +7,9 @@ import org.core.events.EventListener;
 import org.core.models.GlobalNetwork;
 import org.core.services.DeviceService;
 
-public class LogicalWorkspaceEventListener implements EventListener<LogicalWorkspaceEvent> {
+public class LogicalWorkspaceEventListener
+    implements EventListener<LogicalWorkspaceEvent>,
+        com.cisco.pt.ipc.events.LogicalWorkspaceEventListener {
 
   public LogicalWorkspaceEventListener() {}
 
