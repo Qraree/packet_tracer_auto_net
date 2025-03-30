@@ -37,6 +37,10 @@ public class DeviceService {
     logger.log(Level.FINE, "Setup network nodes");
   }
 
+  public static void addDeviceNote(int xCoordinate, int yCoordinate, String text) {
+    logicalWorkspace.addNote(xCoordinate, yCoordinate, Constants.CANVAS_LAYER, text);
+  }
+
   public static ArrayList<Device> getAllDevices() {
     ArrayList<Device> allDevices = new ArrayList<>();
     int deviceCount = network.getDeviceCount();

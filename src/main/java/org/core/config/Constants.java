@@ -38,6 +38,8 @@ public class Constants {
   public static final String DEFAULT_SUBNET_MASK = "255.255.255.0";
   public static final String DEFAULT_PC_INTERFACE = "FastEthernet0";
 
+  public static final Integer CANVAS_LAYER = 10;
+
   // VLAN_NUMBER
   public static final Integer VLAN_DEFAULT_NUMBER = 1;
   public static final Integer VLAN_SERVICE_NUMBER = 1002;
