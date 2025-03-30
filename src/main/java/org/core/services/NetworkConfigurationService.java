@@ -5,6 +5,7 @@ import com.cisco.pt.impl.IPAddressImpl;
 import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.*;
 import com.cisco.pt.ipcutil.PingUtil;
+import com.cisco.pt.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public class NetworkConfigurationService {
 
   // extract to class
   public static void configFinalNetworkRandomV2(ObservableList<NetworkNode> networkNodes) {
-
+    CanvasService.clearLayer(Constants.CANVAS_LAYER);
     int subnetIndex = 2;
 
     ArrayList<NetworkNode> networkDevices =
@@ -64,6 +65,13 @@ public class NetworkConfigurationService {
           HostPort hostPort = (HostPort) nodeConnection.getOtherPort();
           hostPort.setIpSubnetMask(subnetAddress, subnetMask);
           hostPort.setDefaultGateway(defaultGatewayAddress);
+
+          Pair<Integer, Integer> noteCoordinates =
+              UtilCommon.getDeviceNoteCoordinates(networkDeviceNode, connectedNode);
+
+          DeviceService.addDeviceNote(
+              noteCoordinates.getFirst(), noteCoordinates.getSecond(), subnetAddress.toString());
+
           endDeviceIndex++;
         }
 
@@ -81,7 +89,10 @@ public class NetworkConfigurationService {
 
     NetworkLayerConfiguration(networkNodes, subnetIndex);
 
-    PingUtil pingUtil = new PingUtil(PacketTracerConnector.ipcInstance.getFactory(), PacketTracerConnector.ipcInstance.getPacketTracerSession().getEventManager());
+    PingUtil pingUtil =
+        new PingUtil(
+            PacketTracerConnector.ipcInstance.getFactory(),
+            PacketTracerConnector.ipcInstance.getPacketTracerSession().getEventManager());
     pingUtil.sendPing("PC0", new IPAddressImpl("192.168.2.3"), 10, 10);
   }
 
@@ -191,10 +202,6 @@ public class NetworkConfigurationService {
         terminalLine.enterCommand(ospfNetworkCommand);
       }
     }
-  }
-
-  private static OSPFMainProcess getOSPFMainProcess(NetworkNode node) {
-    return (OSPFMainProcess) node.getDevice().getProcess(Constants.OSPF_MAIN_PROCESS);
   }
 
   private static VLANManager getVlanManager(NetworkNode node) {
