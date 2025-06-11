@@ -1,8 +1,8 @@
 package org.core.gui.controllers;
 
 import com.cisco.pt.ipc.sim.*;
+import com.cisco.pt.util.Pair;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.fxml.Initializable;
@@ -60,11 +60,8 @@ public class AddDevicePageController implements Initializable {
     if (GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
     int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
 
-    ArrayList<Device> devices = DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
-    Device networkDevice =
-        DeviceService.addDevice(
-            deviceObjectEnum.getDeviceType(), deviceObjectEnum.getModel(), 200, 200);
-    DeviceService.linkNetworkDeviceToEndDevices(networkDevice, devices);
+    DeviceService.addSubnet(
+        deviceCount, new Pair<>(300, 300), deviceObjectEnum, new Pair<>(200, 200));
   }
 
   public void AddRandomNetwork() throws InterruptedException {
