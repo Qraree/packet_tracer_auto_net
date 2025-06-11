@@ -5,8 +5,9 @@ import com.cisco.pt.ipc.enums.DeviceType;
 public enum DeviceModelEnum {
   LAPTOP("Laptop-PT", DeviceType.LAPTOP, "/images/laptop.png"),
   PC("PC-PT", DeviceType.PC, "/images/pc.jpg"),
-  SWITCH_2960_24TT("2960-24TT", DeviceType.MULTI_LAYER_SWITCH, "/images/switch.jpg"),
+  SWITCH_2960_24TT("2960-24TT", DeviceType.SWITCH, "/images/switch.jpg"),
   SWITCH_3560_24PS("3560-24PS", DeviceType.MULTI_LAYER_SWITCH, "/images/switch_l3.png"),
+  SWITCH_3650_24PS("3650-24PS", DeviceType.MULTI_LAYER_SWITCH, "/images/switch_l3.png"),
   SWITCH_2950_24("2950-24", DeviceType.SWITCH, "/images/switch.jpg"),
   ROUTER1841("1841", DeviceType.ROUTER, "/images/router.png"),
   PDD("Power Distribution Device", DeviceType.POWER_DISTRIBUTION_DEVICE, "/images/cisco.png");
@@ -31,6 +32,16 @@ public enum DeviceModelEnum {
 
   public String getIconPath() {
     return iconPath;
+  }
+
+  public static DeviceModelEnum getDeviceModelEnumByModel(String model) {
+    for (DeviceModelEnum device : values()) {
+      if (device.getModel().equalsIgnoreCase(model)) {
+        return device;
+      }
+    }
+
+    return null;
   }
 
   public static String getIconPathByModel(String model) {

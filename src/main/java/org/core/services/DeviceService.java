@@ -5,15 +5,16 @@ import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.Device;
 import com.cisco.pt.ipc.sim.Network;
 import com.cisco.pt.ipc.ui.LogicalWorkspace;
+import com.cisco.pt.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.core.PacketTracerConnector;
 import org.core.config.Constants;
 import org.core.config.DeviceModelEnum;
+import org.core.config.UtilCommon;
 import org.core.models.GlobalNetwork;
 
 public class DeviceService {
@@ -61,15 +62,22 @@ public class DeviceService {
   public static void linkNetworkDeviceToEndDevices(
       Device networkDevice, ArrayList<Device> endDevices) {
     List<String> networkDevicePorts = networkDevice.getPorts();
+    List<String> filteredPorts =
+        new ArrayList<>(
+            networkDevicePorts.stream().filter(port -> !port.contains("Vlan")).toList());
+
+    System.out.println("PORT" + filteredPorts);
     for (Device endDevice : endDevices) {
       logicalWorkspace.createLink(
           endDevice.getName(),
           Constants.DEFAULT_PC_INTERFACE,
           networkDevice.getName(),
-          networkDevicePorts.getFirst(),
+          filteredPorts.getFirst(),
           ConnectType.ETHERNET_STRAIGHT);
 
-      networkDevicePorts.removeFirst();
+      if (!filteredPorts.isEmpty()) {
+        filteredPorts.removeFirst();
+      }
     }
   }
 
@@ -160,9 +168,11 @@ public class DeviceService {
 
     int randomDeviceIndex = random.nextInt(DevicesArray.length);
 
-    Function<Double, Double> roundedValue = (value) -> Math.round(value * 100.0) / 100.0;
-    double randomXCoordinate = roundedValue.apply(random.nextDouble() * xBoundary);
-    double randomYCoordinate = roundedValue.apply(random.nextDouble() * yBoundary);
+    Pair<Double, Double> RandomCoords =
+        UtilCommon.getRandomCoordinatesWithBoundaries(xBoundary, yBoundary);
+
+    double randomXCoordinate = RandomCoords.getFirst();
+    double randomYCoordinate = RandomCoords.getSecond();
 
     String deviceName =
         logicalWorkspace.addDevice(
