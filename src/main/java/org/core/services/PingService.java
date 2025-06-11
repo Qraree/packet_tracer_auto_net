@@ -6,6 +6,7 @@ import org.core.PacketTracerConnector;
 
 public class PingService {
 
+  // test method
   public void ping() {
     long start = System.nanoTime();
     PingUtil pingUtil =

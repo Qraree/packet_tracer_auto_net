@@ -67,7 +67,7 @@ public class NetworkConfigurationService {
           Pair<Integer, Integer> noteCoordinates =
               UtilCommon.getDeviceNoteCoordinates(networkDeviceNode, connectedNode);
 
-          DeviceService.addDeviceNote(
+          CanvasService.addDeviceNote(
               noteCoordinates.getFirst(), noteCoordinates.getSecond(), subnetAddress.toString());
 
           endDeviceIndex++;
@@ -86,7 +86,6 @@ public class NetworkConfigurationService {
     }
 
     NetworkLayerConfiguration(networkNodes, subnetIndex);
-    
   }
 
   private static void NetworkLayerConfiguration(
