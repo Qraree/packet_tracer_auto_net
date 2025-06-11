@@ -33,7 +33,7 @@ class DeviceTest extends BaseTest {
     Integer PowerDistroDeviceCount = 1;
     Integer subnetRouterCount = 1;
     Integer addedDeviceCount = 3;
-    DeviceService.addSubnet(addedDeviceCount);
+    DeviceService.addSubnetV1(addedDeviceCount);
     ArrayList<Device> devices = DeviceService.getAllDevices();
     for (Device device : devices) {
       String deviceName = device.getName();

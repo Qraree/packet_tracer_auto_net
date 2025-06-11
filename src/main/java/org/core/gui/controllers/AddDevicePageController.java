@@ -1,9 +1,8 @@
 package org.core.gui.controllers;
 
-import com.cisco.pt.ipc.enums.DeviceType;
 import com.cisco.pt.ipc.sim.*;
+import com.cisco.pt.util.Pair;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.fxml.Initializable;
@@ -51,14 +50,18 @@ public class AddDevicePageController implements Initializable {
 
   public void handleAddSubnetAction() {
     String selectedNetworkDevice = subnetNetworkDeviceChoice.getValue();
+    DeviceModelEnum deviceObjectEnum =
+        DeviceModelEnum.getDeviceModelEnumByModel(selectedNetworkDevice);
+
+    if (deviceObjectEnum == null) {
+      throw new RuntimeException("Invalid device model: " + selectedNetworkDevice);
+    }
 
     if (GUIValidator.validateNumberInput(subnetDeviceCount.getText(), 0, 20)) return;
     int deviceCount = Integer.parseInt(subnetDeviceCount.getText());
 
-    ArrayList<Device> devices = DeviceService.addDeviceGroup(deviceCount, 300, 300, 60);
-    Device networkDevice =
-        DeviceService.addDevice(DeviceType.SWITCH, selectedNetworkDevice, 200, 200);
-    DeviceService.linkNetworkDeviceToEndDevices(networkDevice, devices);
+    DeviceService.addSubnet(
+        deviceCount, new Pair<>(300, 300), deviceObjectEnum, new Pair<>(200, 200));
   }
 
   public void AddRandomNetwork() throws InterruptedException {

@@ -2,6 +2,8 @@ package org.core.config;
 
 import com.cisco.pt.ipc.sim.VLAN;
 import com.cisco.pt.util.Pair;
+import java.util.Random;
+import java.util.function.Function;
 import org.core.models.NetworkNode;
 
 public class UtilCommon {
@@ -38,5 +40,17 @@ public class UtilCommon {
     int noteY = (int) (yCoordinateEndDevice - nodeR * Math.sin(noteTheta));
 
     return new Pair<>(noteX, noteY);
+  }
+
+  public static Pair<Double, Double> getRandomCoordinatesWithBoundaries(
+      Integer xBoundary, Integer yBoundary) {
+
+    Random random = new Random();
+
+    Function<Double, Double> roundedValue = (value) -> Math.round(value * 100.0) / 100.0;
+    double randomXCoordinate = roundedValue.apply(random.nextDouble() * xBoundary);
+    double randomYCoordinate = roundedValue.apply(random.nextDouble() * yBoundary);
+
+    return new Pair<>(randomXCoordinate, randomYCoordinate);
   }
 }
