@@ -1,6 +1,6 @@
 ## Packet tracer automation tool
 
-This Java-based desktop app automates network configuration and monitoring in Cisco Packet Tracer. It enables seamless interaction with virtual network environments, allowing users to programmatically configure devices, retrieve network status, and execute automation scripts. It interacts with Packet Tracer through **inter-process communication (IPC)**.
+This Java-based desktop app automates network configuration and monitoring in Cisco Packet Tracer. It enables interaction with virtual network, allowing users to programmatically configure devices. It interacts with Packet Tracer through **inter-process communication (IPC)**.
 
 <img width="1313" alt="Screenshot 2025-03-26 at 21 41 46" src="https://github.com/user-attachments/assets/9e6189ba-c87b-4e8c-9b95-b23f49deb30d" />
 
